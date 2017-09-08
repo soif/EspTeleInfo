@@ -8,6 +8,7 @@ You can see Teleinformation official french datasheet [there][1]
 Since this is really dedicated to French energy measuring system, I will continue in French
 
 ###Installation sur un Wemos D1 Mini
+<br/>
 Copier le contenu de ce dossier (download zip) dans le dossier libraries de votre environnement Arduino Vous devriez avoir maintenant quelque chose comme `your_sketchbook_folder/Wifinfo` et ce dossier doit contentir les fichiers .cpp et .h ainsi que le sous dossier `data`.
 <br/>
 Pour trouver votre dossier de sketchbook, dans l'environnement IDE, allez dans File>Preferences.
@@ -15,7 +16,7 @@ Pour trouver votre dossier de sketchbook, dans l'environnement IDE, allez dans F
 allez voir ce [tutorial][2] sur les librairies Arduino si beoin.
 <br/>
 NB: La librairie [LibTeleinfo][14] est un des pré-requis. Ce référer à son readme pour plus d'information
-</br>
+<br/>
 Une fois le projet Arduino importé dans votre environnement, il ne vous reste plus qu'à compiler (CTRL+R) et à uploader le binaire sur votre Wemos
 
 ###Changements apportés sur les versions:

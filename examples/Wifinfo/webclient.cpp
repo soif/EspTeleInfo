@@ -22,6 +22,9 @@
 
 #include "webclient.h"
 
+#include <map>
+#include <string>
+
 /* ======================================================================
 Function: httpPost
 Purpose : Do a http post
@@ -33,6 +36,11 @@ Comments: -
 ====================================================================== */
 boolean httpPost(char * host, uint16_t port, char * url)
 {
+    return httpPostBasicAuth(host, port, url, (char *)"", (char *)"");
+}
+
+boolean httpPostBasicAuth(char * host, uint16_t port, char * url, char * basicauthusr, char * basicauthpwd)
+{
   HTTPClient http;
   bool ret = false;
 
@@ -40,6 +48,10 @@ boolean httpPost(char * host, uint16_t port, char * url)
 
   // configure traged server and url
   http.begin(host, port, url); 
+  if (basicauthusr != "" && basicauthpwd != "")
+  {
+    http.setAuthorization(basicauthusr, basicauthpwd);
+  }
   //http.begin("http://emoncms.org/input/post.json?node=20&apikey=2f13e4608d411d20354485f72747de7b&json={PAPP:100}");
   //http.begin("emoncms.org", 80, "/input/post.json?node=20&apikey=2f13e4608d411d20354485f72747de7b&json={}"); //HTTP
 
@@ -236,6 +248,210 @@ boolean jeedomPost(void)
       ret = httpPost( config.jeedom.host, config.jeedom.port, (char *) url.c_str()) ;
     } // if me
   } // if host
+  return ret;
+}
+
+/* ======================================================================
+Function: domoticzPost
+Purpose : Do a http post to domoticz server
+Input   : 
+Output  : true if post returned 200 OK
+Comments: -
+====================================================================== */
+boolean domoticzPost(void)
+{
+  boolean ret = true;
+
+    // Some basic checking
+  if (*config.jeedom.host) {
+    ValueList * me = tinfo.getList();
+    std::map<std::string, std::string>  meMap;
+
+    String baseurl;
+    String url;
+    baseurl = *config.domoticz.url ? config.domoticz.url : "/";
+    baseurl += F("?type=command&param=udevice&");
+          
+    // Got at least one ?
+    if (me && me->next) {
+      // Loop thru the node
+      while (me->next) {
+        // go to next node
+        me = me->next;
+        // Si Item virtuel, on le met pas
+        if (*me->name =='_')
+        {
+          //Nothing
+        }
+        else
+        {
+          meMap[me->name] = me->value;
+        }
+        
+      } // While me
+          
+      // /json.htm?type=command&param=udevice&idx=IDX&nvalue=0&svalue=TXT
+      if(config.domoticz.idx_txt > 0)
+      {
+          url = baseurl;
+          url += "idx=";
+          url += config.domoticz.idx_txt;
+          url += "&nvalue=0";
+          url += "&svalue=";
+          url += meMap["ADCO"].c_str();
+
+          if(!httpPost( config.domoticz.host, config.domoticz.port, (char *) url.c_str()))
+          {
+            ret = false;
+          }
+          
+          /*
+          Info(config.domoticz.host);
+          InfoF(":");
+          Info(config.domoticz.port);
+          Infoln((char *) url.c_str());
+          InfoF("ret=");
+          Infoln(ret);
+          Infoflush();
+          */
+      }
+
+      // /json.htm?type=command&param=udevice&idx=IDX&nvalue=0&svalue=USAGE1;USAGE2;RETURN1;RETURN2;CONS;PROD
+      if(config.domoticz.idx_p1sm > 0)
+      {
+          url = baseurl;
+          url += "idx=";
+          url += config.domoticz.idx_p1sm;
+          url += "&nvalue=0";
+          url += "&svalue=";
+          url += String(atoi(meMap["BASE"].c_str())).c_str();
+          url += ";0;0;0;";
+          url += String(atoi(meMap["PAPP"].c_str())).c_str();
+          url += ";0";
+
+          if(!httpPost( config.domoticz.host, config.domoticz.port, (char *) url.c_str()))
+          {
+            ret = false;
+          }
+
+          /*
+          Info(config.domoticz.host);
+          InfoF(":");
+          Info(config.domoticz.port);
+          Infoln((char *) url.c_str());
+          InfoF("ret=");
+          Infoln(ret);
+          Infoflush();
+          */
+      }
+      
+      // /json.htm?type=command&param=udevice&idx=IDX&nvalue=0&svalue=ENERGY
+      if(config.domoticz.idx_crt > 0)
+      {
+          url = baseurl;
+          url += "idx=";
+          url += config.domoticz.idx_crt;
+          url += "&nvalue=0";
+          url += "&svalue=";
+          url += String(atoi(meMap["IINST"].c_str())).c_str();
+
+          if(!httpPost( config.domoticz.host, config.domoticz.port, (char *) url.c_str()))
+          {
+            ret = false;
+          }
+
+          /*
+          Info(config.domoticz.host);
+          InfoF(":");
+          Info(config.domoticz.port);
+          Infoln((char *) url.c_str());
+          InfoF("ret=");
+          Infoln(ret);
+          Infoflush();
+          */
+      }
+
+      // /json.htm?type=command&param=udevice&idx=IDX&nvalue=0&svalue=ENERGY
+      if(config.domoticz.idx_elec > 0)
+      {
+          url = baseurl;
+          url += "idx=";
+          url += config.domoticz.idx_elec;
+          url += "&nvalue=0";
+          url += "&svalue=";
+          url += String(atoi(meMap["PAPP"].c_str())).c_str();
+
+          if(!httpPost( config.domoticz.host, config.domoticz.port, (char *) url.c_str()))
+          {
+            ret = false;
+          }
+
+          /*
+          Info(config.domoticz.host);
+          InfoF(":");
+          Info(config.domoticz.port);
+          Infoln((char *) url.c_str());
+          InfoF("ret=");
+          Infoln(ret);
+          Infoflush();
+          */
+      }
+
+      // /json.htm?type=command&param=udevice&idx=IDX&nvalue=0&svalue=POWER,ENERGY
+      if(config.domoticz.idx_kwh > 0)
+      {
+          url = baseurl;
+          url += "idx=";
+          url += config.domoticz.idx_kwh;
+          url += "&nvalue=0";
+          url += "&svalue=";
+          url += String(atoi(meMap["PAPP"].c_str())).c_str();
+          url += ";";
+          url += String(atoi(meMap["PAPP"].c_str())).c_str();
+
+          if(!httpPost( config.domoticz.host, config.domoticz.port, (char *) url.c_str()))
+          {
+            ret = false;
+          }
+
+          /*
+          Info(config.domoticz.host);
+          InfoF(":");
+          Info(config.domoticz.port);
+          Infoln((char *) url.c_str());
+          InfoF("ret=");
+          Infoln(ret);
+          Infoflush();
+          */
+      }
+      // /json.htm?type=command&param=udevice&idx=IDX&nvalue=0&svalue=PERCENTAGE
+      if(config.domoticz.idx_pct > 0)
+      {
+          url = baseurl;
+          url += "idx=";
+          url += config.domoticz.idx_pct;
+          url += "&nvalue=0";
+          url += "&svalue=";
+          url += String( roundf((atof(meMap["IINST"].c_str())* 100) / atof(meMap["ISOUSC"].c_str()) * 100) / 100 ).c_str();
+
+          if(!httpPost( config.domoticz.host, config.domoticz.port, (char *) url.c_str()))
+          {
+            ret = false;
+          }
+
+          /*
+          Info(config.domoticz.host);
+          InfoF(":");
+          Info(config.domoticz.port);
+          Infoln((char *) url.c_str());
+          InfoF("ret=");
+          Infoln(ret);
+          Infoflush();
+          */
+      }
+      
+    } // if me
+  }
   return ret;
 }
 

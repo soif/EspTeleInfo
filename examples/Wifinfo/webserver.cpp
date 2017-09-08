@@ -119,6 +119,63 @@ bool handleFileRead(String path) {
 }
 
 /* ======================================================================
+Function: handleSpiffsOperation 
+Purpose : hadle SPIFFS operation like file upload/replace, file delete
+Input   : -
+Output  : - 
+Comments: -
+====================================================================== */
+void handleSpiffsOperation(void)
+{
+  String response="";
+  int ret;
+
+  for(int i=0;i<server.args();i++)
+  {
+    Info(server.argName(i));
+    InfoF("=");
+    Infoln(server.arg(i));
+  }
+  Infoflush();
+  
+  if (server.hasArg("action") && server.hasArg("file"))
+  {
+    String action=server.arg("action");
+    String file=server.arg("file");
+
+    if (action == "delete")
+    {
+      if (SPIFFS.exists(file))
+      {
+        if(SPIFFS.remove(file))
+        {
+          response += "File deleted!";
+          ret = 200;
+        }
+        else
+        {
+          response += "Unable to delete file!";
+          ret = 400;
+        }
+      }
+    }
+    else
+    {
+      response += "Bad argument(s)!";
+      ret = 400;
+    }
+  }
+  else
+  {
+    response += "Missing argument(s)";
+    ret = 400;
+  }
+  
+
+  server.send ( ret, "text/plain", response);
+}
+
+/* ======================================================================
 Function: handleFormConfig 
 Purpose : handle main configuration page
 Input   : -
@@ -136,16 +193,23 @@ void handleFormConfig(void)
   if (server.hasArg("save"))
   {
     int itemp;
-    DebuglnF("===== Posted configuration"); 
-
+    InfolnF("===== Posted configuration"); 
+    
     // WifInfo
     strncpy(config.ssid ,   server.arg("ssid").c_str(),     CFG_SSID_SIZE );
     strncpy(config.psk ,    server.arg("psk").c_str(),      CFG_PSK_SIZE );
     strncpy(config.host ,   server.arg("host").c_str(),     CFG_HOSTNAME_SIZE );
     strncpy(config.ap_psk , server.arg("ap_psk").c_str(),   CFG_PSK_SIZE );
+    itemp = server.arg("ap_retrycount").toInt();
+    config.ap_retrycount = (itemp>0 && itemp <300) ? itemp : CFG_AP_DEFAULT_RETCNT;
     strncpy(config.ota_auth,server.arg("ota_auth").c_str(), CFG_PSK_SIZE );
     itemp = server.arg("ota_port").toInt();
     config.ota_port = (itemp>=0 && itemp<=65535) ? itemp : DEFAULT_OTA_PORT ;
+
+    if(server.hasArg("cfg_debug")) { config.config |= CFG_DEBUG; } else { config.config &= ~CFG_DEBUG; }
+    if(server.hasArg("cfg_oled")) { config.config |= CFG_LCD; } else { config.config &= ~CFG_LCD; }
+    if(server.hasArg("cfg_rgb")) { config.config |= CFG_RGB_LED; } else { config.config &= ~CFG_RGB_LED; }
+    if(server.hasArg("cfg_info")) { config.config |= CFG_INFO; } else { config.config &= ~CFG_INFO; }
 
     // Emoncms
     strncpy(config.emoncms.host,   server.arg("emon_host").c_str(),  CFG_EMON_HOST_SIZE );
@@ -174,13 +238,48 @@ void handleFormConfig(void)
     config.jeedom.port = (itemp>=0 && itemp<=65535) ? itemp : CFG_JDOM_DEFAULT_PORT ; 
     itemp = server.arg("jdom_freq").toInt();
     if (itemp>0 && itemp<=86400){
-      // Emoncms Update if needed
+      // jeedom Update if needed
       Tick_jeedom.detach();
       Tick_jeedom.attach(itemp, Task_jeedom);
     } else {
       itemp = 0 ; 
     }
     config.jeedom.freq = itemp;
+
+    // domoticz
+    strncpy(config.domoticz.host,   server.arg("dmcz_host").c_str(),  CFG_DMCZ_HOST_SIZE );
+    strncpy(config.domoticz.url,    server.arg("dmcz_url").c_str(),   CFG_DMCZ_URL_SIZE );
+    strncpy(config.domoticz.usr,    server.arg("dmcz_usr").c_str(),   CFG_DMCZ_USR_SIZE );
+    strncpy(config.domoticz.pwd,    server.arg("dmcz_pwd").c_str(),   CFG_DMCZ_PWD_SIZE );
+    itemp = server.arg("dmcz_idx_txt").toInt();
+    config.domoticz.idx_txt = itemp; 
+    
+    itemp = server.arg("dmcz_idx_p1sm").toInt();
+    config.domoticz.idx_p1sm = itemp; 
+    
+    itemp = server.arg("dmcz_idx_crt").toInt();
+    config.domoticz.idx_crt = itemp; 
+    
+    itemp = server.arg("dmcz_idx_elec").toInt();
+    config.domoticz.idx_elec = itemp; 
+    
+    itemp = server.arg("dmcz_idx_kwh").toInt();
+    config.domoticz.idx_kwh = itemp; 
+    
+    itemp = server.arg("dmcz_idx_pct").toInt();
+    config.domoticz.idx_pct = itemp; 
+    
+    itemp = server.arg("dmcz_port").toInt();
+    config.domoticz.port = (itemp>=0 && itemp<=65535) ? itemp : CFG_DMCZ_DEFAULT_PORT ; 
+    itemp = server.arg("dmcz_freq").toInt();
+    if (itemp>0 && itemp<=86400){
+      // domoticz Update if needed
+      Tick_domoticz.detach();
+      Tick_domoticz.attach(itemp, Task_domoticz);
+    } else {
+      itemp = 0 ; 
+    }
+    config.domoticz.freq = itemp;
 
     if ( saveConfig() ) {
       ret = 200;
@@ -363,7 +462,82 @@ void tinfoJSONTable(void)
 }
 
 
+/* ======================================================================
+Function: logJSONTable 
+Purpose : dump all log values in JSON table format for browser
+Input   : -
+Output  : - 
+Comments: -
+====================================================================== */
+void logJSONTable(void)
+{
+  String response = "";
+  bool first = true;
 
+  // Just to debug where we are
+  Debug(F("Serving /log page...\r\n"));
+
+    // Json start
+    response += F("[\r\n");
+
+    if (config.config & CFG_INFO) 
+    {
+
+        if (SPIFFS.exists("/log.txt"))
+        {
+          String temp = "";
+          
+          File f = SPIFFS.open("/log.txt", "r");
+          while (f.available()){
+           
+            String tempwhile = "";
+            String line = f.readStringUntil('\n');
+            tempwhile += ",{\"ev\":\"";
+            tempwhile += line.substring(0,line.length()-1);
+            tempwhile += "\"}\r\n";
+            temp = tempwhile + temp;
+            
+          }
+          f.close();
+
+          response += ( first ? temp.substring(1,temp.length()-1) : temp );
+        }
+        
+        if (SPIFFS.exists("/log.1"))
+        {
+          String temp = "";
+          
+          File f = SPIFFS.open("/log.1", "r");
+          while (f.available()){
+
+            String tempwhile = "";
+            String line = f.readStringUntil('\n');
+            tempwhile += ",{\"ev\":\"";
+            tempwhile += line.substring(0,line.length()-1);
+            tempwhile += "\"}\r\n";
+            temp = tempwhile + temp;
+            
+          }
+          f.close();
+
+          response += ( first ? temp.substring(1,temp.length()-1) : temp );
+        }
+    }
+    else
+    {
+        response += F("{\"ev\":\"");
+        response +=  "Fonctionnalité non activée" ;
+        response += "\"}" ;
+    }
+    
+
+   // Json end
+   response += F("]");
+   
+  Debug(F("sending..."));
+  server.send ( 200, "text/json", response );
+  Debugln(F("OK!"));
+}
 
 
 /* ======================================================================
@@ -485,14 +659,35 @@ void getConfJSONData(String & r)
   r+=CFG_FORM_PSK;       r+=FPSTR(FP_QCQ); r+=config.psk;            r+= FPSTR(FP_QCNL); 
   r+=CFG_FORM_HOST;      r+=FPSTR(FP_QCQ); r+=config.host;           r+= FPSTR(FP_QCNL); 
   r+=CFG_FORM_AP_PSK;    r+=FPSTR(FP_QCQ); r+=config.ap_psk;         r+= FPSTR(FP_QCNL); 
+  r+=CFG_FORM_AP_RETCNT; r+=FPSTR(FP_QCQ); r+=config.ap_retrycount;  r+= FPSTR(FP_QCNL);
+  
   r+=CFG_FORM_EMON_HOST; r+=FPSTR(FP_QCQ); r+=config.emoncms.host;   r+= FPSTR(FP_QCNL); 
   r+=CFG_FORM_EMON_PORT; r+=FPSTR(FP_QCQ); r+=config.emoncms.port;   r+= FPSTR(FP_QCNL); 
   r+=CFG_FORM_EMON_URL;  r+=FPSTR(FP_QCQ); r+=config.emoncms.url;    r+= FPSTR(FP_QCNL); 
   r+=CFG_FORM_EMON_KEY;  r+=FPSTR(FP_QCQ); r+=config.emoncms.apikey; r+= FPSTR(FP_QCNL); 
   r+=CFG_FORM_EMON_NODE; r+=FPSTR(FP_QCQ); r+=config.emoncms.node;   r+= FPSTR(FP_QCNL); 
   r+=CFG_FORM_EMON_FREQ; r+=FPSTR(FP_QCQ); r+=config.emoncms.freq;   r+= FPSTR(FP_QCNL); 
+  
   r+=CFG_FORM_OTA_AUTH;  r+=FPSTR(FP_QCQ); r+=config.ota_auth;       r+= FPSTR(FP_QCNL); 
   r+=CFG_FORM_OTA_PORT;  r+=FPSTR(FP_QCQ); r+=config.ota_port;       r+= FPSTR(FP_QCNL);
+  
+  if (config.config & CFG_DEBUG)   { r+=CFG_FORM_CFG_DEBUG;  r+=FPSTR(FP_QCQ); r+= FPSTR(FP_QCNL); }
+  if (config.config & CFG_INFO)    { r+=CFG_FORM_CFG_INFO;   r+=FPSTR(FP_QCQ); r+= FPSTR(FP_QCNL); }
+  if (config.config & CFG_RGB_LED) { r+=CFG_FORM_CFG_RGB;    r+=FPSTR(FP_QCQ); r+= FPSTR(FP_QCNL); }
+  if (config.config & CFG_LCD)     { r+=CFG_FORM_CFG_OLED;   r+=FPSTR(FP_QCQ); r+= FPSTR(FP_QCNL); }
+
+  r+=CFG_FORM_DMCZ_HOST;     r+=FPSTR(FP_QCQ); r+=config.domoticz.host;     r+= FPSTR(FP_QCNL); 
+  r+=CFG_FORM_DMCZ_PORT;     r+=FPSTR(FP_QCQ); r+=config.domoticz.port;     r+= FPSTR(FP_QCNL); 
+  r+=CFG_FORM_DMCZ_URL;      r+=FPSTR(FP_QCQ); r+=config.domoticz.url;      r+= FPSTR(FP_QCNL); 
+  r+=CFG_FORM_DMCZ_USR;      r+=FPSTR(FP_QCQ); r+=config.domoticz.usr;      r+= FPSTR(FP_QCNL); 
+  r+=CFG_FORM_DMCZ_PWD;      r+=FPSTR(FP_QCQ); r+=config.domoticz.pwd;      r+= FPSTR(FP_QCNL); 
+  r+=CFG_FORM_DMCZ_IDX_TXT;  r+=FPSTR(FP_QCQ); r+=config.domoticz.idx_txt;  r+= FPSTR(FP_QCNL); 
+  r+=CFG_FORM_DMCZ_IDX_P1SM; r+=FPSTR(FP_QCQ); r+=config.domoticz.idx_p1sm; r+= FPSTR(FP_QCNL); 
+  r+=CFG_FORM_DMCZ_IDX_CRT;  r+=FPSTR(FP_QCQ); r+=config.domoticz.idx_crt;  r+= FPSTR(FP_QCNL); 
+  r+=CFG_FORM_DMCZ_IDX_ELEC; r+=FPSTR(FP_QCQ); r+=config.domoticz.idx_elec; r+= FPSTR(FP_QCNL); 
+  r+=CFG_FORM_DMCZ_IDX_KWH;  r+=FPSTR(FP_QCQ); r+=config.domoticz.idx_kwh;  r+= FPSTR(FP_QCNL); 
+  r+=CFG_FORM_DMCZ_IDX_PCT;  r+=FPSTR(FP_QCQ); r+=config.domoticz.idx_pct;  r+= FPSTR(FP_QCNL); 
+  r+=CFG_FORM_DMCZ_FREQ;     r+=FPSTR(FP_QCQ); r+=config.domoticz.freq;     r+= FPSTR(FP_QCNL); 
 
   r+=CFG_FORM_JDOM_HOST; r+=FPSTR(FP_QCQ); r+=config.jeedom.host;   r+= FPSTR(FP_QCNL); 
   r+=CFG_FORM_JDOM_PORT; r+=FPSTR(FP_QCQ); r+=config.jeedom.port;   r+= FPSTR(FP_QCNL); 
@@ -556,6 +751,8 @@ void getSpiffsJSONData(String & response)
     response += fileName.c_str();
     response += F("\",\"va\":\"");
     response += fileSize;
+    response += F("\",\"act\":\"");
+    response += fileName.c_str();
     response += F("\"}\r\n");
   }
   response += F("],\r\n");
@@ -571,7 +768,7 @@ void getSpiffsJSONData(String & response)
   response += info.totalBytes ;
   response += F(", \"Used\":");
   response += info.usedBytes ;
-  response += F(", \"ram\":");
+  response += F(", \"Ram\":");
   response += system_get_free_heap_size() ;
   response += F("}\r\n]"); 
 
@@ -682,7 +879,6 @@ void wifiScanJSON(void)
   server.send ( 200, "text/json", response );
   Debugln(F("Ok!"));
 }
-
 
 /* ======================================================================
 Function: handleFactoryReset 
@@ -809,4 +1005,3 @@ void handleNotFound(void)
   // Led off
   LedBluOFF();
 }
-

@@ -12,9 +12,13 @@
 // This program works with the Wifinfo board
 // see schematic here https://github.com/hallard/teleinfo/tree/master/Wifinfo
 //
-// Written by Charles-Henri Hallard (http://hallard.me)
+// This program has been downloaded from https://github.com/hallard/LibTeleinfo/tree/master/examples/Wifinfo
 //
-// History : V1.00 2015-06-14 - First release
+// Written by Charles-Henri Hallard (http://hallard.me)
+// Updated by Sylvain REMY (https://github.com/sremy91)
+//
+// History : V1.00 2015-06-14 - Charles-Henri HALLARD - First release
+// History : V2.00 2017-08-27 - Sylvain REMY          - Domoticz management, some improvements & bug fixes
 //
 // All text above must be included in any redistribution.
 //
@@ -37,9 +41,17 @@
 
 // Global project file
 #include "Wifinfo.h"
+#include "StringStream.h"
+#include "PString.h"
+
+char floggerbuffer[255];
+PString flogger(floggerbuffer, sizeof(floggerbuffer));
 
 //WiFiManager wifi(0);
 ESP8266WebServer server(80);
+
+//holds the current upload
+File fsUploadFile;
 
 bool ota_blink;
 
@@ -63,10 +75,12 @@ Ticker red_ticker;
 Ticker Every_1_Sec;
 Ticker Tick_emoncms;
 Ticker Tick_jeedom;
+Ticker Tick_domoticz;
 
 volatile boolean task_1_sec = false;
 volatile boolean task_emoncms = false;
 volatile boolean task_jeedom = false;
+volatile boolean task_domoticz = false;
 unsigned long seconds = 0;
 
 // sysinfo data
@@ -127,6 +141,18 @@ Comments: Like an Interrupt, need to be short, we set flag for main loop
 void Task_jeedom()
 {
   task_jeedom = true;
+}
+
+/* ======================================================================
+Function: Task_domoticz
+Purpose : callback of domoticz ticker
+Input   : 
+Output  : -
+Comments: Like an Interrupt, need to be short, we set flag for main loop
+====================================================================== */
+void Task_domoticz()
+{
+  task_domoticz = true;
 }
 
 /* ======================================================================
@@ -358,7 +384,8 @@ void ResetConfig(void)
   config.ota_port = DEFAULT_OTA_PORT ;
 
   // Add other init default config here
-
+  config.ap_retrycount = CFG_AP_DEFAULT_RETCNT;
+  
   // Emoncms
   strcpy_P(config.emoncms.host, CFG_EMON_DEFAULT_HOST);
   config.emoncms.port = CFG_EMON_DEFAULT_PORT;
@@ -370,7 +397,12 @@ void ResetConfig(void)
   strcpy_P(config.jeedom.url, CFG_JDOM_DEFAULT_URL);
   //strcpy_P(config.jeedom.adco, CFG_JDOM_DEFAULT_ADCO);
 
-  config.config |= CFG_RGB_LED;
+  // Domoticz
+  strcpy_P(config.domoticz.host, CFG_DMCZ_DEFAULT_HOST);
+  config.domoticz.port = CFG_DMCZ_DEFAULT_PORT;
+  strcpy_P(config.domoticz.url, CFG_DMCZ_DEFAULT_URL);
+  
+  config.config |= CFG_DEBUG;
 
   // save back
   saveConfig();
@@ -396,11 +428,11 @@ int WifiHandleConn(boolean setup = false)
 
     // no correct SSID
     if (!*config.ssid) {
-      DebugF("no Wifi SSID in config, trying to get SDK ones..."); 
+      InfoF("no Wifi SSID in config, trying to get SDK ones..."); 
 
       // Let's see of SDK one is okay
       if ( WiFi.SSID() == "" ) {
-        DebuglnF("Not found may be blank chip!"); 
+        InfolnF("Not found may be blank chip!"); 
       } else {
         *config.psk = '\0';
 
@@ -411,7 +443,7 @@ int WifiHandleConn(boolean setup = false)
         if (WiFi.psk() != "")
           strcpy(config.psk, WiFi.psk().c_str());
 
-        DebuglnF("found one!"); 
+        InfolnF("found one!"); 
 
         // save back new config
         saveConfig();
@@ -422,26 +454,27 @@ int WifiHandleConn(boolean setup = false)
     if (*config.ssid) {
       uint8_t timeout ;
 
-      DebugF("Connecting to: "); 
-      Debug(config.ssid);
-      Debugflush();
+      InfoF("Connecting to: ");
+      Info(config.ssid);
+      Infoflush();
 
       // Do wa have a PSK ?
       if (*config.psk) {
         // protected network
-        Debug(F(" with key '"));
-        Debug(config.psk);
-        Debug(F("'..."));
-        Debugflush();
+        Info(F(" with key '"));
+        Info(config.psk);
+        Infoln(F("'..."));
+        Infoflush();
+        
         WiFi.begin(config.ssid, config.psk);
       } else {
         // Open network
-        Debug(F("unsecure AP"));
-        Debugflush();
+        Infoln(F("unsecure AP"));
+        Infoflush();
         WiFi.begin(config.ssid);
       }
 
-      timeout = 25; // 25 * 200 ms = 5 sec time out
+      timeout = config.ap_retrycount; // 25 * 200 ms = 5 sec time out => 30s
       // 200 ms loop
       while ( ((ret = WiFi.status()) != WL_CONNECTED) && timeout )
       {
@@ -452,23 +485,25 @@ int WifiHandleConn(boolean setup = false)
         delay(150);
         --timeout;
       }
+      InfoF("Waited "); Info(String((config.ap_retrycount - timeout) * 200)); InfolnF("ms");
+      Infoflush();
     }
-
 
     // connected ? disable AP, client mode only
     if (ret == WL_CONNECTED)
     {
-      DebuglnF("connected!");
+      InfolnF("Connected!");
       WiFi.mode(WIFI_STA);
 
-      DebugF("IP address   : "); Debugln(WiFi.localIP());
-      DebugF("MAC address  : "); Debugln(WiFi.macAddress());
+      InfoF("IP address   : "); Infoln(WiFi.localIP());
+      InfoF("MAC address  : "); Infoln(WiFi.macAddress());
+      Infoflush();
     
     // not connected ? start AP
     } else {
       char ap_ssid[32];
-      DebuglnF("Error!");
-      Debugflush();
+      InfolnF("Error!");
+      Infoflush();
 
       // STA+AP Mode without connected to STA, autoconnect will search
       // other frequencies while trying to connect, this is causing issue
@@ -479,25 +514,25 @@ int WifiHandleConn(boolean setup = false)
 
       // SSID = hostname
       strcpy(ap_ssid, config.host );
-      DebugF("Switching to AP ");
-      Debugln(ap_ssid);
-      Debugflush();
-
+      InfoF("Switching to AP ");
+      Infoln(ap_ssid);
+      Infoflush();
+      
       // protected network
       if (*config.ap_psk) {
-        DebugF(" with key '");
-        Debug(config.ap_psk);
-        DebuglnF("'");
+        InfoF("With key '");
+        Info(config.ap_psk);
+        InfolnF("'");
         WiFi.softAP(ap_ssid, config.ap_psk);
       // Open network
       } else {
-        DebuglnF(" with no password");
+        InfolnF("With no password");
         WiFi.softAP(ap_ssid);
       }
       WiFi.mode(WIFI_AP_STA);
 
-      DebugF("IP address   : "); Debugln(WiFi.softAPIP());
-      DebugF("MAC address  : "); Debugln(WiFi.softAPmacAddress());
+      InfoF("IP address   : "); Infoln(WiFi.softAPIP());
+      InfoF("MAC address  : "); Infoln(WiFi.softAPmacAddress());
     }
 
     // Set OTA parameters
@@ -535,7 +570,7 @@ void setup()
 {
   char buff[32];
   boolean reset_config = true;
-
+  
   // Set CPU speed to 160MHz
   system_update_cpu_freq(160);
 
@@ -554,11 +589,11 @@ void setup()
   // note this serial can only transmit, just 
   // enough for debugging purpose
   DEBUG_SERIAL.begin(115200);
-  Debugln(F("\r\n\r\n=============="));
-  Debug(F("WifInfo V"));
-  Debugln(F(WIFINFO_VERSION));
-  Debugln();
-  Debugflush();
+  Infoln(F("\r\n\r\n=============="));
+  Info(F("WifInfo V"));
+  Infoln(F(WIFINFO_VERSION));
+  Infoln();
+  Infoflush();
 
   // Clear our global flags
   config.config = 0;
@@ -577,10 +612,10 @@ void setup()
   if (!SPIFFS.begin())
   {
     // Serious problem
-    DebuglnF("SPIFFS Mount failed");
+    InfolnF("SPIFFS Mount failed");
   } else {
    
-    DebuglnF("SPIFFS Mount succesfull");
+    InfolnF("SPIFFS Mount succesfull");
 
     Dir dir = SPIFFS.openDir("/");
     while (dir.next()) {    
@@ -639,12 +674,12 @@ void setup()
 
   ArduinoOTA.onError([](ota_error_t error) {
     LedRGBON(COLOR_RED);
-    Debugf("Update Error[%u]: ", error);
-    if (error == OTA_AUTH_ERROR) DebuglnF("Auth Failed");
-    else if (error == OTA_BEGIN_ERROR) DebuglnF("Begin Failed");
-    else if (error == OTA_CONNECT_ERROR) DebuglnF("Connect Failed");
-    else if (error == OTA_RECEIVE_ERROR) DebuglnF("Receive Failed");
-    else if (error == OTA_END_ERROR) DebuglnF("End Failed");
+    Infof("Update Error[%u]: ", error); 
+    if (error == OTA_AUTH_ERROR) { InfolnF("Auth Failed"); }
+    else if (error == OTA_BEGIN_ERROR) { InfolnF("Begin Failed"); }
+    else if (error == OTA_CONNECT_ERROR) { InfolnF("Connect Failed"); }
+    else if (error == OTA_RECEIVE_ERROR) { InfolnF("Receive Failed"); }
+    else if (error == OTA_END_ERROR) { InfolnF("End Failed"); }
     ESP.restart(); 
   });
 
@@ -656,8 +691,10 @@ void setup()
   server.on("/json", sendJSON);
   server.on("/tinfo.json", tinfoJSONTable);
   server.on("/system.json", sysJSONTable);
+  server.on("/log.json", logJSONTable);
   server.on("/config.json", confJSONTable);
   server.on("/spiffs.json", spiffsJSONTable);
+  server.on("/spiffs", handleSpiffsOperation);
   server.on("/wifiscan.json", wifiScanJSON);
   server.on("/factory_reset", handleFactoryReset);
   server.on("/reset", handleReset);
@@ -668,6 +705,57 @@ void setup()
       server.sendHeader("Access-Control-Allow-Origin", "*");
       server.send(200, "text/html", R"(OK)");
   });
+
+  // handler for the /upload form POST (once file upload finishes)
+  server.on("/upload", HTTP_POST, 
+    // handler once file upload finishes
+    [&]() {
+      server.sendHeader("Connection", "close");
+      server.sendHeader("Access-Control-Allow-Origin", "*");
+      server.send(200, "text/plain", "OK");
+    },
+    // handler for upload, get's the file bytes, 
+    // and writes them to SPIFFS
+    [&]() {
+      HTTPUpload& upload = server.upload();
+
+      if(upload.status == UPLOAD_FILE_START) {
+        String filename = upload.filename;
+        if(!filename.startsWith("/")) filename = "/"+filename;
+        Infof("Upload: %s\n", filename.c_str());
+        Infoflush();
+        fsUploadFile = SPIFFS.open(filename, "w");
+        filename = String();
+      } else if(upload.status == UPLOAD_FILE_WRITE) {
+        if(fsUploadFile) 
+        {
+            Info(".");
+            if(fsUploadFile.write(upload.buf, upload.currentSize) != upload.currentSize) 
+            {
+              InfolnF("Written buffer missmatch!");
+              Infoflush();
+            }
+        }
+        else
+        {
+              InfolnF("No valid fsUploadFile object!");
+              Infoflush();
+        }
+      } else if(upload.status == UPLOAD_FILE_END) {
+        if(fsUploadFile)
+        {
+          fsUploadFile.close();
+          InfoF("Uploaded file Size: ");
+          Infoln(upload.totalSize);
+          Infoflush();
+        }
+      } else if(upload.status == UPLOAD_FILE_ABORTED) {
+        InfolnF("Update was aborted");
+        Infoflush();
+      }
+      delay(0);
+    }
+  );////
 
   // handler for the /update form POST (once file upload finishes)
   server.on("/update", HTTP_POST, 
@@ -685,14 +773,34 @@ void setup()
 
       if(upload.status == UPLOAD_FILE_START) {
         uint32_t maxSketchSpace = (ESP.getFreeSketchSpace() - 0x1000) & 0xFFFFF000;
+        int command; //To handle both SPIFFS and FLASH update
         WiFiUDP::stopAll();
-        Debugf("Update: %s\n", upload.filename.c_str());
+        Infof("Update: %s\n", upload.filename.c_str());
+        Infoflush();
         LedRGBON(COLOR_MAGENTA);
         ota_blink = true;
 
+        if (upload.filename == "Wifinfo.spiffs.bin") //TODO: to be secured by checking Magic Number... 0xE9 for Flash 0x00 4 times for SPIFFS (No Magic Number)
+        {
+          command = U_SPIFFS;
+          Infoln("Flashing SPIFFS");
+          Infoflush();
+        }
+        else
+        {
+          command = U_FLASH;
+          Infoln("Flashing CPP");
+          Infoflush();
+        }
+
         //start with max available size
-        if(!Update.begin(maxSketchSpace)) 
+        if(!Update.begin(maxSketchSpace,command)) 
+        {
           Update.printError(Serial1);
+          InfoF("Error with maxSketchSpace=");
+          Infoln(maxSketchSpace);
+          Infoflush();
+        }
 
       } else if(upload.status == UPLOAD_FILE_WRITE) {
         if (ota_blink) {
@@ -701,23 +809,40 @@ void setup()
           LedRGBOFF();
         }
         ota_blink = !ota_blink;
-        Debug(".");
+        Info(".");
         if(Update.write(upload.buf, upload.currentSize) != upload.currentSize) 
+        {
           Update.printError(Serial1);
+          InfolnF("Written buffer missmatch!");
+          Infoflush();
+        }
 
       } else if(upload.status == UPLOAD_FILE_END) {
         //true to set the size to the current progress
         if(Update.end(true)) 
-          Debugf("Update Success: %u\nRebooting...\n", upload.totalSize);
+        {
+          Infof("Update Success: %u\nRebooting...\n", upload.totalSize);
+          Infoflush();
+        }
         else 
+        {
           Update.printError(Serial1);
+          String s;
+          StringStream ss ( s ) ;
+          Update.printError(ss);
+          ss.flush();
+          InfoF("Enf of update failed");
+          Infoln(s.c_str());
+          Infoflush();
+        }
 
         LedRGBOFF();
 
       } else if(upload.status == UPLOAD_FILE_ABORTED) {
         Update.end();
         LedRGBOFF();
-        DebuglnF("Update was aborted");
+        InfolnF("Update was aborted");
+        Infoflush();
       }
       delay(0);
     }
@@ -736,7 +861,7 @@ void setup()
   // Display configuration
   showConfig();
 
-  Debugln(F("HTTP server started"));
+  Infoln(F("HTTP server started"));
 
   // Teleinfo is connected to RXD2 (GPIO13) to 
   // avoid conflict when flashing, this is why
@@ -773,6 +898,43 @@ void setup()
   // Jeedom Update if needed
   if (config.jeedom.freq) 
     Tick_jeedom.attach(config.jeedom.freq, Task_jeedom);
+
+  // Domoticz Update if needed
+  if (config.domoticz.freq) 
+    Tick_domoticz.attach(config.domoticz.freq, Task_domoticz);
+}
+
+void floggerflush()
+{
+  if(SPIFFS.begin())
+  {
+   //check max size & switch file if needed
+  File fr = SPIFFS.open("/log.txt", "r");
+  if(fr)
+  {
+    if (fr.size() >= 10000)
+      {
+        fr.close();
+        if (SPIFFS.exists("/log.1"))
+        {
+          SPIFFS.remove("/log.1");
+        }
+        SPIFFS.rename("/log.txt","/log.1");
+      }
+      else
+      {
+        fr.close();
+      }
+  }
+   
+   // open file for writing
+  File f = SPIFFS.open("/log.txt", "a+");
+  if (f) {
+      f.print(floggerbuffer);
+      flogger.begin();
+  }
+  f.close();
+  }
 }
 
 /* ======================================================================
@@ -789,7 +951,7 @@ void loop()
   // Do all related network stuff
   server.handleClient();
   ArduinoOTA.handle();
-
+  
   //webSocket.loop();
 
   // Only once task per loop, let system do it own task
@@ -802,6 +964,9 @@ void loop()
   } else if (task_jeedom) { 
     jeedomPost();  
     task_jeedom=false;
+  } else if (task_domoticz) { 
+    domoticzPost();  
+    task_domoticz=false;
   }
 
   // Handle teleinfo serial

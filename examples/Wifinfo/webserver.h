@@ -43,6 +43,7 @@ void handleNotFound(void);
 void tinfoJSONTable(void);
 void getSysJSONData(String & r);
 void sysJSONTable(void);
+void logJSONTable(void);
 void getConfJSONData(String & r);
 void confJSONTable(void);
 void getSpiffsJSONData(String & r);
@@ -51,5 +52,6 @@ void sendJSON(void);
 void wifiScanJSON(void);
 void handleFactoryReset(void);
 void handleReset(void);
+void handleSpiffsOperation(void);
 
 #endif

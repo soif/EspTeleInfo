@@ -24,7 +24,6 @@
 // Configuration structure for whole program
 _Config config;
 
-
 uint16_t crc16Update(uint16_t crc, uint8_t a)
 {
   int i;
@@ -101,7 +100,7 @@ bool readConfig (bool clear_on_error)
 		// calc CRC
 		crc = crc16Update(crc, data);
 	}
-	
+  
 	// CRC Error ?
 	if (crc != 0) {
 		// Clear config if wanted
@@ -152,12 +151,16 @@ bool saveConfig (void)
   // default config and breaks OTA
   ret_code = readConfig(false);
   
-  Debug(F("Write config "));
+  Info(F("Write config "));
   
   if (ret_code)
-    Debugln(F("OK!"));
+  {
+    Infoln(F("OK!"));
+  }
   else
-    Debugln(F("Error!"));
+  {
+    Infoln(F("Error!"));
+  }
 
   //eepromDump(32);
   
@@ -178,14 +181,14 @@ void showConfig()
   DebugF("ssid     :"); Debugln(config.ssid); 
   DebugF("psk      :"); Debugln(config.psk); 
   DebugF("host     :"); Debugln(config.host); 
-  DebugF("ap_psk   :"); Debugln(config.ap_psk); 
+  DebugF("ap_psk   :"); Debugln(config.ap_psk);
+  DebugF("ap_retrycount:"); Debugln(config.ap_retrycount); 
   DebugF("OTA auth :"); Debugln(config.ota_auth); 
   DebugF("OTA port :"); Debugln(config.ota_port); 
   DebugF("Config   :"); 
   if (config.config & CFG_RGB_LED) DebugF(" RGB"); 
   if (config.config & CFG_DEBUG)   DebugF(" DEBUG"); 
   if (config.config & CFG_LCD)     DebugF(" LCD"); 
-
   DebuglnF("\r\n===== Emoncms"); 
   DebugF("host     :"); Debugln(config.emoncms.host); 
   DebugF("port     :"); Debugln(config.emoncms.port); 
@@ -201,5 +204,19 @@ void showConfig()
   DebugF("key      :"); Debugln(config.jeedom.apikey); 
   DebugF("compteur :"); Debugln(config.jeedom.adco); 
   DebugF("freq     :"); Debugln(config.jeedom.freq); 
+
+  DebuglnF("\r\n===== Domoticz"); 
+  DebugF("host     :"); Debugln(config.domoticz.host); 
+  DebugF("port     :"); Debugln(config.domoticz.port); 
+  DebugF("url      :"); Debugln(config.domoticz.url); 
+  DebugF("user     :"); Debugln(config.domoticz.usr); 
+  DebugF("password :"); Debugln(config.domoticz.pwd);
+  DebugF("idx_txt :"); Debugln(config.domoticz.idx_txt); 
+  DebugF("idx_p1sm :"); Debugln(config.domoticz.idx_p1sm); 
+  DebugF("idx_crt  :"); Debugln(config.domoticz.idx_crt); 
+  DebugF("idx_elec :"); Debugln(config.domoticz.idx_elec); 
+  DebugF("idx_kwh :"); Debugln(config.domoticz.idx_kwh); 
+  DebugF("idx_pct  :"); Debugln(config.domoticz.idx_pct); 
+  DebugF("freq     :"); Debugln(config.domoticz.freq); 
 }
 

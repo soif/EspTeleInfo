@@ -44,31 +44,51 @@ extern "C" {
 #include "webserver.h"
 #include "webclient.h"
 #include "config.h"
+#include "PString.h"
 
+//External function from main CPP
+void floggerflush();
 
 #define DEBUG
+#define INFO
 #define DEBUG_SERIAL	Serial1
 #define DEBUG_SERIAL1	
 
-#define WIFINFO_VERSION "1.0.1"
+#define WIFINFO_VERSION "1.0.2"
 
 // I prefix debug macro to be sure to use specific for THIS library
 // debugging, this should not interfere with main sketch or other 
 // libraries
 #ifdef DEBUG
-#define Debug(x)    DEBUG_SERIAL.print(x)
-#define Debugln(x)  DEBUG_SERIAL.println(x)
-#define DebugF(x)   DEBUG_SERIAL.print(F(x))
-#define DebuglnF(x) DEBUG_SERIAL.println(F(x))
-#define Debugf(...) DEBUG_SERIAL.printf(__VA_ARGS__)
-#define Debugflush  DEBUG_SERIAL.flush
+#define Debug(x)     if (config.config & CFG_DEBUG) { DEBUG_SERIAL.print(x); }
+#define Debugln(x)   if (config.config & CFG_DEBUG) { DEBUG_SERIAL.println(x); }
+#define DebugF(x)    if (config.config & CFG_DEBUG) { DEBUG_SERIAL.print(F(x)); }
+#define DebuglnF(x)  if (config.config & CFG_DEBUG) { DEBUG_SERIAL.println(F(x)); }
+#define Debugf(...)  if (config.config & CFG_DEBUG) { DEBUG_SERIAL.printf(__VA_ARGS__); }
+#define Debugflush() if (config.config & CFG_DEBUG) { DEBUG_SERIAL.flush(); }
 #else
-#define Debug(x)    {}
-#define Debugln(x)  {}
-#define DebugF(x)   {}
-#define DebuglnF(x) {}
-#define Debugf(...) {}
-#define Debugflush  {}
+#define Debug(x)     {}
+#define Debugln(x)   {}
+#define DebugF(x)    {}
+#define DebuglnF(x)  {}
+#define Debugf(...)  {}
+#define Debugflush() {}
+#endif
+
+#ifdef INFO
+#define Info(x)     if (config.config & CFG_INFO) { DEBUG_SERIAL.print(x); } if (config.config & CFG_INFO) { flogger.print(x); floggerflush(); }
+#define Infoln(x)   if (config.config & CFG_INFO) { DEBUG_SERIAL.println(x); } if (config.config & CFG_INFO) { flogger.println(x); floggerflush(); }
+#define InfoF(x)    if (config.config & CFG_INFO) { DEBUG_SERIAL.print(F(x)); } if (config.config & CFG_INFO) { flogger.print(F(x)); floggerflush(); }
+#define InfolnF(x)  if (config.config & CFG_INFO) { DEBUG_SERIAL.println(F(x)); } if (config.config & CFG_INFO) { flogger.println(F(x)); floggerflush(); }
+#define Infof(...)  if (config.config & CFG_INFO) { DEBUG_SERIAL.printf(__VA_ARGS__); } if (config.config & CFG_INFO) { flogger.printf(__VA_ARGS__); floggerflush(); }
+#define Infoflush() if (config.config & CFG_INFO) { DEBUG_SERIAL.flush(); }
+#else
+#define Info(x)    {}
+#define Infoln(x)  {}
+#define InfoF(x)   {}
+#define InfolnF(x) {}
+#define Infof(...) {}
+#define Infoflush()  {}
 #endif
 
 #define BLINK_LED_MS   50 // 50 ms blink
@@ -124,13 +144,15 @@ extern unsigned long seconds;
 extern _sysinfo sysinfo;
 extern Ticker Tick_emoncms;
 extern Ticker Tick_jeedom;
-
+extern Ticker Tick_domoticz;
+extern PString flogger;
 
 // Exported function located in main sketch
 // ===================================================
 void ResetConfig(void);
 void Task_emoncms();
 void Task_jeedom();
+void Task_domoticz();
 
 #endif
 

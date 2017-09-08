@@ -32,7 +32,9 @@
 // declared exported function from route.cpp
 // ===================================================
 boolean httpPost(char * host, uint16_t port, char * url);
+boolean httpPostBasicAuth(char * host, uint16_t port, char * url, char * basicauthusr, char * basicauthpwd);
 boolean emoncmsPost(void);
 boolean jeedomPost(void);
+boolean domoticzPost(void);
 
 #endif
