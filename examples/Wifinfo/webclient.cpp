@@ -406,8 +406,8 @@ boolean domoticzPost(void)
           url += "&nvalue=0";
           url += "&svalue=";
           url += String(atoi(meMap["PAPP"].c_str())).c_str();
-          url += ";";
-          url += String(atoi(meMap["PAPP"].c_str())).c_str();
+          url += ";0";
+          //url += String(atoi(meMap["IINST"].c_str())).c_str(); Computed by Domoticz
 
           if(!httpPost( config.domoticz.host, config.domoticz.port, (char *) url.c_str()))
           {
