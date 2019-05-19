@@ -324,8 +324,10 @@ boolean domoticzPost(void)
           url += config.domoticz.idx_p1sm;
           url += "&nvalue=0";
           url += "&svalue=";
-          url += String(atoi(meMap["BASE"].c_str())).c_str();
-          url += ";0;0;0;";
+          url += String(atoi(meMap["HCHC"].c_str())).c_str();
+          url += ";";
+          url += String(atoi(meMap["HCHP"].c_str())).c_str();
+          url += ";0;0;";
           url += String(atoi(meMap["PAPP"].c_str())).c_str();
           url += ";0";
 
