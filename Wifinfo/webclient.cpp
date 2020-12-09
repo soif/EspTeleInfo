@@ -324,6 +324,11 @@ boolean domoticzPost(void)
           url += config.domoticz.idx_p1sm;
           url += "&nvalue=0";
           url += "&svalue=";
+
+          //https://github.com/mattdevue/LibTeleinfo/commit/3a937279a1170ca9608e37b97214a527bdd526c2
+//          url += String(atoi(meMap["BASE"].c_str())).c_str();
+//          url += ";0;0;0;";
+
           url += String(atoi(meMap["HCHC"].c_str())).c_str();
           url += ";";
           url += String(atoi(meMap["HCHP"].c_str())).c_str();
