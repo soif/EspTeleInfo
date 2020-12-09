@@ -46,8 +46,9 @@ Comments: -
 ====================================================================== */
 void eepromDump(uint8_t bytesPerRow) 
 {
-  uint16_t i,b;
-  char buf[10];
+ // uint16_t i,b; // // Unused Variable 'b'
+  uint16_t i;
+  //char buf[10];
   uint16_t j=0 ;
   
   // default to 16 bytes per row

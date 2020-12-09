@@ -97,7 +97,7 @@ Comments: -
 void UpdateSysinfo(boolean first_call, boolean show_debug)
 {
   char buff[64];
-  int32_t adc;
+  //int32_t adc;  // Unused Variable
   int sec = seconds;
   int min = sec / 60;
   int hr = min / 60;
@@ -568,8 +568,8 @@ Comments: -
 ====================================================================== */
 void setup()
 {
-  char buff[32];
-  boolean reset_config = true;
+  //char buff[32];    // Unused Variable
+  //boolean reset_config = true;    // Unused Variable
   
   // Set CPU speed to 160MHz
   system_update_cpu_freq(160);

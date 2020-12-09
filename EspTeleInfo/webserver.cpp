@@ -107,7 +107,7 @@ bool handleFileRead(String path) {
     DebuglnF(" found on FS");
  
     File file = SPIFFS.open(path, "r");
-    size_t sent = server.streamFile(file, contentType);
+    size_t sent = server.streamFile(file, contentType); //compiler complains, BUT we need this
     file.close();
     return true;
   }
@@ -171,7 +171,6 @@ void handleSpiffsOperation(void)
     ret = 400;
   }
   
-
   server.send ( ret, "text/plain", response);
 }
 
@@ -335,7 +334,7 @@ void formatNumberJSON( String &response, char * value)
   if (value && strlen(value))
   {
     boolean isNumber = true;
-    uint8_t c;
+    // uint8_t c; // Unused Variable
     char * p = value;
 
     // just to be sure
@@ -384,7 +383,7 @@ void tinfoJSONTable(void)
 
   // Got at least one ?
   if (me) {
-    uint8_t index=0;
+    //uint8_t index=0;  //Unused variable
 
     boolean first_item = true;
     // Json start
@@ -728,7 +727,7 @@ Comments: -
 ====================================================================== */
 void getSpiffsJSONData(String & response)
 {
-  char buffer[32];
+  //char buffer[32]; // Unused Variable
   bool first_item = true;
 
   // Json start
