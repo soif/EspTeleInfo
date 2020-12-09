@@ -171,6 +171,7 @@ void handleSpiffsOperation(void)
     ret = 400;
   }
   
+  // TOFIX: compiler is unhappy : warning: 'ret' may be used uninitialized in this function 
   server.send ( ret, "text/plain", response);
 }
 
