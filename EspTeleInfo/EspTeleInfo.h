@@ -19,8 +19,8 @@
 // All text above must be included in any redistribution.
 //
 // **********************************************************************************
-#ifndef WIFINFO_H
-#define WIFINFO_H
+#ifndef ESPTELEINFO_H
+#define ESPTELEINFO_H
 
 // Include Arduino header
 #include <Arduino.h>

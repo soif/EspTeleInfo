@@ -40,7 +40,7 @@
 #include <FS.h>
 
 // Global project file
-#include "Wifinfo.h"
+#include "EspTeleInfo.h"
 #include "StringStream.h"
 #include "PString.h"
 

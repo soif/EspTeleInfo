@@ -23,7 +23,7 @@
 #define __CONFIG_H__
 
 // Include main project include file
-#include "Wifinfo.h"
+#include "EspTeleInfo.h"
 
 #define CFG_SSID_SIZE 		32
 #define CFG_PSK_SIZE  		64
@@ -56,7 +56,7 @@
 
 // Port pour l'OTA
 #define DEFAULT_OTA_PORT     8266
-#define DEFAULT_OTA_AUTH     "OTA_WifInfo"
+#define DEFAULT_OTA_AUTH     "OTA_EspTeleInfo"
 //#define DEFAULT_OTA_AUTH     ""
 
 // Bit definition for different configuration modes

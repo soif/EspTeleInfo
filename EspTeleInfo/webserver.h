@@ -24,7 +24,7 @@
 #define WEBSERVER_H
 
 // Include main project include file
-#include "Wifinfo.h"
+#include "EspTeleInfo.h"
 
 // Web response max size
 #define RESPONSE_BUFFER_SIZE 4096

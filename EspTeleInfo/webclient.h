@@ -24,7 +24,7 @@
 #define WEBCLIENT_H
 
 // Include main project include file
-#include "Wifinfo.h"
+#include "EspTeleInfo.h"
 
 // Exported variables/object instancied in main sketch
 // ===================================================
