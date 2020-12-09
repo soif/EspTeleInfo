@@ -560,7 +560,7 @@ void getSysJSONData(String & response)
   response += sysinfo.sys_uptime;
   response += "\"},\r\n";
 
-  response += "{\"na\":\"WifInfo Version\",\"va\":\"" WIFINFO_VERSION "\"},\r\n";
+  response += "{\"na\":\"WifInfo Version\",\"va\":\"" ESPTELEINFO_VERSION "\"},\r\n";
 
   response += "{\"na\":\"Compile le\",\"va\":\"" __DATE__ " " __TIME__ "\"},\r\n";
 

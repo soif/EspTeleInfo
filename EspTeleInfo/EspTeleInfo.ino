@@ -378,8 +378,8 @@ void ResetConfig(void)
   // Start cleaning all that stuff
   memset(&config, 0, sizeof(_Config));
 
-  // Set default Hostname
-  sprintf_P(config.host, PSTR("WifInfo-%06X"), ESP.getChipId());
+  // Set default Hostname (max 16 chars)
+  sprintf_P(config.host, PSTR("TeleInfo-%06X"), ESP.getChipId());
   strcpy_P(config.ota_auth, PSTR(DEFAULT_OTA_AUTH));
   config.ota_port = DEFAULT_OTA_PORT ;
 
@@ -590,8 +590,8 @@ void setup()
   // enough for debugging purpose
   DEBUG_SERIAL.begin(115200);
   Infoln(F("\r\n\r\n=============="));
-  Info(F("WifInfo V"));
-  Infoln(F(WIFINFO_VERSION));
+  Info(F("EspTeleInfo V"));
+  Infoln(F(ESPTELEINFO_VERSION));
   Infoln();
   Infoflush();
 
