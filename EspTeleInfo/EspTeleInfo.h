@@ -54,7 +54,7 @@ void floggerflush();
 #define DEBUG_SERIAL	Serial1
 #define DEBUG_SERIAL1	
 
-#define ESPTELEINFO_VERSION "1.0.2"
+#define ESPTELEINFO_VERSION "2.0.0a"
 
 // I prefix debug macro to be sure to use specific for THIS library
 // debugging, this should not interfere with main sketch or other 
