@@ -21,6 +21,8 @@
 // **********************************************************************************
 
 #include "webclient.h"
+#include <Base64.h>
+
 
 #include <map>
 #include <string>
@@ -272,7 +274,16 @@ boolean domoticzPost(void)
     String url;
     baseurl = *config.domoticz.url ? config.domoticz.url : "/";
     baseurl += F("?type=command&param=udevice&");
-          
+
+    if(strlen(config.domoticz.usr) >0 && strlen(config.domoticz.pwd) >0 ){
+      baseurl += "username=";
+      baseurl +=base64::encode(config.domoticz.usr);
+      baseurl += "&password=";
+      baseurl +=base64::encode(config.domoticz.pwd);
+      baseurl += "&";
+    }
+
+
     // Got at least one ?
     if (me && me->next) {
       // Loop thru the node
