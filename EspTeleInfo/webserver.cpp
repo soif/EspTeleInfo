@@ -446,6 +446,81 @@ void tinfoJSONTable(void)
       response += (char) me->checksum;
       response += F("\", \"fl\":");
       response += me->flags ;
+
+      //add description, https://www.enedis.fr/sites/default/files/Enedis-NOI-CPT_54E.pdf
+      response += F(", \"de\":\"") ;
+      if(!strcmp(me->name, "ADCO")){
+        response += F("Adresse du compteur");
+      }
+      else if(!strcmp(me->name, "OPTARIF")){
+        response += F("Option Tarifaire");
+      }
+      else if(!strcmp(me->name, "ISOUSC")){
+        response += F("Intensité souscrite");
+      }
+      else if(!strcmp(me->name, "BASE")){
+        response += F("Index option Base");
+      }
+      else if(!strcmp(me->name, "HCHC")){
+        response += F("Heures Creuses");
+      }
+      else if(!strcmp(me->name, "HCHP")){
+        response += F("Heures Pleines");
+      }
+      else if(!strcmp(me->name, "EJPHN")){
+        response += F("Heures Normales");
+      }
+      else if(!strcmp(me->name, "EJPHPM")){
+        response += F("Heures de Pointe Mobile");
+      }
+      else if(!strcmp(me->name, "BBRHCJB")){
+        response += F("Heures Creuses Jours Bleus");
+      }
+      else if(!strcmp(me->name, "BBRHPJB")){
+        response += F("Heures Pleines Jours Bleus");
+      }
+      else if(!strcmp(me->name, "BBRHCJW")){
+        response += F("Heures Creuses Jours Blancs");
+      }
+      else if(!strcmp(me->name, "BBRHPJW")){
+        response += F("Heures Pleines Jours Blancs");
+      }
+      else if(!strcmp(me->name, "BBRHCJR")){
+        response += F("Heures Creuses Jours Rouges");
+      }
+      else if(!strcmp(me->name, "BBRHPJR")){
+        response += F("Heures Pleines Jours Rouges");
+      }
+      else if(!strcmp(me->name, "PEJP")){
+        response += F("Préavis Début EJP (30 min)");
+      }
+      else if(!strcmp(me->name, "PTEC")){
+        response += F("Période Tarifaire en cours");
+      }
+      else if(!strcmp(me->name, "DEMAIN")){
+        response += F("Couleur du lendemain");
+      }
+      else if(!strcmp(me->name, "IINST")){
+        response += F("Intensité Instantanée");
+      }
+      else if(!strcmp(me->name, "ADPS")){
+        response += F("Avertiss. de Dépassement De Puissance Souscrite");
+      }
+      else if(!strcmp(me->name, "IMAX")){
+        response += F("Intensité maximale appelée");
+      }
+      else if(!strcmp(me->name, "PAPP")){
+        response += F("Puissance apparente");
+      }
+      else if(!strcmp(me->name, "HHPHC")){
+        response += F("Horaire HP HC");
+      }
+      else if(!strcmp(me->name, "MOTDETAT")){
+        response += F("Mot d'état du compteur");
+      }
+      response += F("\"") ;
+
+
       response += '}' ;
 
     }
