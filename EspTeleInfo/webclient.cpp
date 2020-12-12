@@ -50,8 +50,7 @@ boolean httpPostBasicAuth(char * host, uint16_t port, char * url, char * basicau
 
   // configure traged server and url
   http.begin(host, port, url); 
-  // TOFIX : compiler is unhappy with this : warning: comparison with string literal results in unspecified behaviour 
-  if (basicauthusr != "" && basicauthpwd != "")
+  if ( strlen(basicauthusr) >0 && strlen(basicauthpwd) >0)
   {
     http.setAuthorization(basicauthusr, basicauthpwd);
   }
