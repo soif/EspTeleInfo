@@ -580,7 +580,7 @@ int WifiHandleConn(boolean setup = false) {
 		oled.clearDisplay();
 		oled.setTextSize(2);
 		oled.setCursor(0, 0);
-		oled.print(F("Start..."));
+		oled.println(F("Start..."));
 		oled.display();
 
 	} // if setup
@@ -971,6 +971,9 @@ void setup()
 	// Domoticz Update if needed
 	if (config.domoticz.freq) 
 		Tick_domoticz.attach(config.domoticz.freq, Task_domoticz);
+	
+	oled.clearDisplay();
+	oled.display();
 }
 
 // ================================================
