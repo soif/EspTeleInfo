@@ -43,15 +43,15 @@ Comments: -
 ====================================================================== */
 String formatSize(size_t bytes)
 {
-  if (bytes < 1024){
-    return String(bytes) + F(" Byte");
-  } else if(bytes < (1024 * 1024)){
-    return String(bytes/1024.0) + F(" KB");
-  } else if(bytes < (1024 * 1024 * 1024)){
-    return String(bytes/1024.0/1024.0) + F(" MB");
-  } else {
-    return String(bytes/1024.0/1024.0/1024.0) + F(" GB");
-  }
+	if (bytes < 1024){
+		return String(bytes) + F(" Byte");
+	} else if(bytes < (1024 * 1024)){
+		return String(bytes/1024.0) + F(" KB");
+	} else if(bytes < (1024 * 1024 * 1024)){
+		return String(bytes/1024.0/1024.0) + F(" MB");
+	} else {
+		return String(bytes/1024.0/1024.0/1024.0) + F(" GB");
+	}
 }
 
 /* ======================================================================
@@ -62,26 +62,26 @@ Output  : Mime content type
 Comments: -
 ====================================================================== */
 String getContentType(String filename) {
-  if(filename.endsWith(".htm")) return F("text/html");
-  else if(filename.endsWith(".html")) return F("text/html");
-  else if(filename.endsWith(".css")) return F("text/css");
-  else if(filename.endsWith(".json")) return F("text/json");
-  else if(filename.endsWith(".js")) return F("application/javascript");
-  else if(filename.endsWith(".png")) return F("image/png");
-  else if(filename.endsWith(".gif")) return F("image/gif");
-  else if(filename.endsWith(".jpg")) return F("image/jpeg");
-  else if(filename.endsWith(".ico")) return F("image/x-icon");
-  else if(filename.endsWith(".xml")) return F("text/xml");
-  else if(filename.endsWith(".pdf")) return F("application/x-pdf");
-  else if(filename.endsWith(".zip")) return F("application/x-zip");
-  else if(filename.endsWith(".gz")) return F("application/x-gzip");
-  else if(filename.endsWith(".otf")) return F("application/x-font-opentype");
-  else if(filename.endsWith(".eot")) return F("application/vnd.ms-fontobject");
-  else if(filename.endsWith(".svg")) return F("image/svg+xml");
-  else if(filename.endsWith(".woff")) return F("application/x-font-woff");
-  else if(filename.endsWith(".woff2")) return F("application/x-font-woff2");
-  else if(filename.endsWith(".ttf")) return F("application/x-font-ttf");
-  return "text/plain";
+	if(filename.endsWith(".htm")) return F("text/html");
+	else if(filename.endsWith(".html")) return F("text/html");
+	else if(filename.endsWith(".css")) return F("text/css");
+	else if(filename.endsWith(".json")) return F("text/json");
+	else if(filename.endsWith(".js")) return F("application/javascript");
+	else if(filename.endsWith(".png")) return F("image/png");
+	else if(filename.endsWith(".gif")) return F("image/gif");
+	else if(filename.endsWith(".jpg")) return F("image/jpeg");
+	else if(filename.endsWith(".ico")) return F("image/x-icon");
+	else if(filename.endsWith(".xml")) return F("text/xml");
+	else if(filename.endsWith(".pdf")) return F("application/x-pdf");
+	else if(filename.endsWith(".zip")) return F("application/x-zip");
+	else if(filename.endsWith(".gz")) return F("application/x-gzip");
+	else if(filename.endsWith(".otf")) return F("application/x-font-opentype");
+	else if(filename.endsWith(".eot")) return F("application/vnd.ms-fontobject");
+	else if(filename.endsWith(".svg")) return F("image/svg+xml");
+	else if(filename.endsWith(".woff")) return F("application/x-font-woff");
+	else if(filename.endsWith(".woff2")) return F("application/x-font-woff2");
+	else if(filename.endsWith(".ttf")) return F("application/x-font-ttf");
+	return "text/plain";
 }
 
 /* ======================================================================
@@ -92,33 +92,33 @@ Output  : true if file found and sent
 Comments: -
 ====================================================================== */
 bool handleFileRead(String path) {
-  if ( path.endsWith("/") ) 
-    path += "index.htm";
-  
-  String contentType = getContentType(path);
-  String pathWithGz = path + ".gz";
+	if ( path.endsWith("/") ) 
+		path += "index.htm";
+	
+	String contentType = getContentType(path);
+	String pathWithGz = path + ".gz";
 
-  DebugF("handleFileRead ");
-  Debug(path);
+	DebugF("handleFileRead ");
+	Debug(path);
 
-  if(SPIFFS.exists(pathWithGz) || SPIFFS.exists(path)) {
-    if( SPIFFS.exists(pathWithGz) ){
-      path += ".gz";
-      DebugF(".gz");
-    }
+	if(SPIFFS.exists(pathWithGz) || SPIFFS.exists(path)) {
+		if( SPIFFS.exists(pathWithGz) ){
+			path += ".gz";
+			DebugF(".gz");
+		}
 
-    DebuglnF(" found on FS");
+		DebuglnF(" found on FS");
  
-    File file = SPIFFS.open(path, "r");
-    size_t sent = server.streamFile(file, contentType); //compiler complains, BUT we need this
-    file.close();
-    return true;
-  }
+		File file = SPIFFS.open(path, "r");
+		size_t sent = server.streamFile(file, contentType); //compiler complains, BUT we need this
+		file.close();
+		return true;
+	}
 
-  Debugln("");
+	Debugln("");
 
-  server.send(404, "text/plain", "File Not Found");
-  return false;
+	server.send(404, "text/plain", "File Not Found");
+	return false;
 }
 
 /* ======================================================================
@@ -130,52 +130,52 @@ Comments: -
 ====================================================================== */
 void handleSpiffsOperation(void)
 {
-  String response="";
-  int ret;
+	String response="";
+	int ret;
 
-  for(int i=0;i<server.args();i++)
-  {
-    Info(server.argName(i));
-    InfoF("=");
-    Infoln(server.arg(i));
-  }
-  Infoflush();
-  
-  if (server.hasArg("action") && server.hasArg("file"))
-  {
-    String action=server.arg("action");
-    String file=server.arg("file");
+	for(int i=0;i<server.args();i++)
+	{
+		Info(server.argName(i));
+		InfoF("=");
+		Infoln(server.arg(i));
+	}
+	Infoflush();
+	
+	if (server.hasArg("action") && server.hasArg("file"))
+	{
+		String action=server.arg("action");
+		String file=server.arg("file");
 
-    if (action == "delete")
-    {
-      if (SPIFFS.exists(file))
-      {
-        if(SPIFFS.remove(file))
-        {
-          response += "File deleted!";
-          ret = 200;
-        }
-        else
-        {
-          response += "Unable to delete file!";
-          ret = 400;
-        }
-      }
-    }
-    else
-    {
-      response += "Bad argument(s)!";
-      ret = 400;
-    }
-  }
-  else
-  {
-    response += "Missing argument(s)";
-    ret = 400;
-  }
-  
-  // TOFIX: compiler is unhappy : warning: 'ret' may be used uninitialized in this function 
-  server.send ( ret, "text/plain", response);
+		if (action == "delete")
+		{
+			if (SPIFFS.exists(file))
+			{
+				if(SPIFFS.remove(file))
+				{
+					response += "File deleted!";
+					ret = 200;
+				}
+				else
+				{
+					response += "Unable to delete file!";
+					ret = 400;
+				}
+			}
+		}
+		else
+		{
+			response += "Bad argument(s)!";
+			ret = 400;
+		}
+	}
+	else
+	{
+		response += "Missing argument(s)";
+		ret = 400;
+	}
+	
+	// TOFIX: compiler is unhappy : warning: 'ret' may be used uninitialized in this function 
+	server.send ( ret, "text/plain", response);
 }
 
 /* ======================================================================
@@ -187,125 +187,125 @@ Comments: -
 ====================================================================== */
 void handleFormConfig(void) 
 {
-  String response="";
-  int ret ;
+	String response="";
+	int ret ;
 
-  LedBluON();
+	LedBluON();
 
-  // We validated config ?
-  if (server.hasArg("save"))
-  {
-    int itemp;
-    InfolnF("===== Posted configuration"); 
-    
-    // WifInfo
-    strncpy(config.ssid ,   server.arg("ssid").c_str(),     CFG_SSID_SIZE );
-    strncpy(config.psk ,    server.arg("psk").c_str(),      CFG_PSK_SIZE );
-    strncpy(config.host ,   server.arg("host").c_str(),     CFG_HOSTNAME_SIZE );
-    strncpy(config.ap_psk , server.arg("ap_psk").c_str(),   CFG_PSK_SIZE );
-    itemp = server.arg("ap_retrycount").toInt();
-    config.ap_retrycount = (itemp>0 && itemp <300) ? itemp : CFG_AP_DEFAULT_RETCNT;
-    strncpy(config.ota_auth,server.arg("ota_auth").c_str(), CFG_PSK_SIZE );
-    itemp = server.arg("ota_port").toInt();
-    config.ota_port = (itemp>=0 && itemp<=65535) ? itemp : DEFAULT_OTA_PORT ;
+	// We validated config ?
+	if (server.hasArg("save"))
+	{
+		int itemp;
+		InfolnF("===== Posted configuration"); 
+		
+		// WifInfo
+		strncpy(config.ssid ,   server.arg("ssid").c_str(),     CFG_SSID_SIZE );
+		strncpy(config.psk ,    server.arg("psk").c_str(),      CFG_PSK_SIZE );
+		strncpy(config.host ,   server.arg("host").c_str(),     CFG_HOSTNAME_SIZE );
+		strncpy(config.ap_psk , server.arg("ap_psk").c_str(),   CFG_PSK_SIZE );
+		itemp = server.arg("ap_retrycount").toInt();
+		config.ap_retrycount = (itemp>0 && itemp <300) ? itemp : CFG_AP_DEFAULT_RETCNT;
+		strncpy(config.ota_auth,server.arg("ota_auth").c_str(), CFG_PSK_SIZE );
+		itemp = server.arg("ota_port").toInt();
+		config.ota_port = (itemp>=0 && itemp<=65535) ? itemp : DEFAULT_OTA_PORT ;
 
-    if(server.hasArg("cfg_debug")) { config.config |= CFG_DEBUG; } else { config.config &= ~CFG_DEBUG; }
-    if(server.hasArg("cfg_oled")) { config.config |= CFG_LCD; } else { config.config &= ~CFG_LCD; }
-    if(server.hasArg("cfg_rgb")) { config.config |= CFG_RGB_LED; } else { config.config &= ~CFG_RGB_LED; }
-    if(server.hasArg("cfg_info")) { config.config |= CFG_INFO; } else { config.config &= ~CFG_INFO; }
+		if(server.hasArg("cfg_debug")) { config.config |= CFG_DEBUG; } else { config.config &= ~CFG_DEBUG; }
+		if(server.hasArg("cfg_oled")) { config.config |= CFG_LCD; } else { config.config &= ~CFG_LCD; }
+		if(server.hasArg("cfg_rgb")) { config.config |= CFG_RGB_LED; } else { config.config &= ~CFG_RGB_LED; }
+		if(server.hasArg("cfg_info")) { config.config |= CFG_INFO; } else { config.config &= ~CFG_INFO; }
 
-    // Emoncms
-    strncpy(config.emoncms.host,   server.arg("emon_host").c_str(),  CFG_EMON_HOST_SIZE );
-    strncpy(config.emoncms.url,    server.arg("emon_url").c_str(),   CFG_EMON_URL_SIZE );
-    strncpy(config.emoncms.apikey, server.arg("emon_apikey").c_str(),CFG_EMON_APIKEY_SIZE );
-    itemp = server.arg("emon_node").toInt();
-    config.emoncms.node = (itemp>=0 && itemp<=255) ? itemp : 0 ;
-    itemp = server.arg("emon_port").toInt();
-    config.emoncms.port = (itemp>=0 && itemp<=65535) ? itemp : CFG_EMON_DEFAULT_PORT ; 
-    itemp = server.arg("emon_freq").toInt();
-    if (itemp>0 && itemp<=86400){
-      // Emoncms Update if needed
-      Tick_emoncms.detach();
-      Tick_emoncms.attach(itemp, Task_emoncms);
-    } else {
-      itemp = 0 ; 
-    }
-    config.emoncms.freq = itemp;
+		// Emoncms
+		strncpy(config.emoncms.host,   server.arg("emon_host").c_str(),  CFG_EMON_HOST_SIZE );
+		strncpy(config.emoncms.url,    server.arg("emon_url").c_str(),   CFG_EMON_URL_SIZE );
+		strncpy(config.emoncms.apikey, server.arg("emon_apikey").c_str(),CFG_EMON_APIKEY_SIZE );
+		itemp = server.arg("emon_node").toInt();
+		config.emoncms.node = (itemp>=0 && itemp<=255) ? itemp : 0 ;
+		itemp = server.arg("emon_port").toInt();
+		config.emoncms.port = (itemp>=0 && itemp<=65535) ? itemp : CFG_EMON_DEFAULT_PORT ; 
+		itemp = server.arg("emon_freq").toInt();
+		if (itemp>0 && itemp<=86400){
+			// Emoncms Update if needed
+			Tick_emoncms.detach();
+			Tick_emoncms.attach(itemp, Task_emoncms);
+		} else {
+			itemp = 0 ; 
+		}
+		config.emoncms.freq = itemp;
 
-    // jeedom
-    strncpy(config.jeedom.host,   server.arg("jdom_host").c_str(),  CFG_JDOM_HOST_SIZE );
-    strncpy(config.jeedom.url,    server.arg("jdom_url").c_str(),   CFG_JDOM_URL_SIZE );
-    strncpy(config.jeedom.apikey, server.arg("jdom_apikey").c_str(),CFG_JDOM_APIKEY_SIZE );
-    strncpy(config.jeedom.adco,   server.arg("jdom_adco").c_str(),CFG_JDOM_ADCO_SIZE );
-    itemp = server.arg("jdom_port").toInt();
-    config.jeedom.port = (itemp>=0 && itemp<=65535) ? itemp : CFG_JDOM_DEFAULT_PORT ; 
-    itemp = server.arg("jdom_freq").toInt();
-    if (itemp>0 && itemp<=86400){
-      // jeedom Update if needed
-      Tick_jeedom.detach();
-      Tick_jeedom.attach(itemp, Task_jeedom);
-    } else {
-      itemp = 0 ; 
-    }
-    config.jeedom.freq = itemp;
+		// jeedom
+		strncpy(config.jeedom.host,   server.arg("jdom_host").c_str(),  CFG_JDOM_HOST_SIZE );
+		strncpy(config.jeedom.url,    server.arg("jdom_url").c_str(),   CFG_JDOM_URL_SIZE );
+		strncpy(config.jeedom.apikey, server.arg("jdom_apikey").c_str(),CFG_JDOM_APIKEY_SIZE );
+		strncpy(config.jeedom.adco,   server.arg("jdom_adco").c_str(),CFG_JDOM_ADCO_SIZE );
+		itemp = server.arg("jdom_port").toInt();
+		config.jeedom.port = (itemp>=0 && itemp<=65535) ? itemp : CFG_JDOM_DEFAULT_PORT ; 
+		itemp = server.arg("jdom_freq").toInt();
+		if (itemp>0 && itemp<=86400){
+			// jeedom Update if needed
+			Tick_jeedom.detach();
+			Tick_jeedom.attach(itemp, Task_jeedom);
+		} else {
+			itemp = 0 ; 
+		}
+		config.jeedom.freq = itemp;
 
-    // domoticz
-    strncpy(config.domoticz.host,   server.arg("dmcz_host").c_str(),  CFG_DMCZ_HOST_SIZE );
-    strncpy(config.domoticz.url,    server.arg("dmcz_url").c_str(),   CFG_DMCZ_URL_SIZE );
-    strncpy(config.domoticz.usr,    server.arg("dmcz_usr").c_str(),   CFG_DMCZ_USR_SIZE );
-    strncpy(config.domoticz.pwd,    server.arg("dmcz_pwd").c_str(),   CFG_DMCZ_PWD_SIZE );
-    itemp = server.arg("dmcz_idx_txt").toInt();
-    config.domoticz.idx_txt = itemp; 
-    
-    itemp = server.arg("dmcz_idx_p1sm").toInt();
-    config.domoticz.idx_p1sm = itemp; 
-    
-    itemp = server.arg("dmcz_idx_crt").toInt();
-    config.domoticz.idx_crt = itemp; 
-    
-    itemp = server.arg("dmcz_idx_elec").toInt();
-    config.domoticz.idx_elec = itemp; 
-    
-    itemp = server.arg("dmcz_idx_kwh").toInt();
-    config.domoticz.idx_kwh = itemp; 
-    
-    itemp = server.arg("dmcz_idx_pct").toInt();
-    config.domoticz.idx_pct = itemp; 
-    
-    itemp = server.arg("dmcz_port").toInt();
-    config.domoticz.port = (itemp>=0 && itemp<=65535) ? itemp : CFG_DMCZ_DEFAULT_PORT ; 
-    itemp = server.arg("dmcz_freq").toInt();
-    if (itemp>0 && itemp<=86400){
-      // domoticz Update if needed
-      Tick_domoticz.detach();
-      Tick_domoticz.attach(itemp, Task_domoticz);
-    } else {
-      itemp = 0 ; 
-    }
-    config.domoticz.freq = itemp;
+		// domoticz
+		strncpy(config.domoticz.host,   server.arg("dmcz_host").c_str(),  CFG_DMCZ_HOST_SIZE );
+		strncpy(config.domoticz.url,    server.arg("dmcz_url").c_str(),   CFG_DMCZ_URL_SIZE );
+		strncpy(config.domoticz.usr,    server.arg("dmcz_usr").c_str(),   CFG_DMCZ_USR_SIZE );
+		strncpy(config.domoticz.pwd,    server.arg("dmcz_pwd").c_str(),   CFG_DMCZ_PWD_SIZE );
+		itemp = server.arg("dmcz_idx_txt").toInt();
+		config.domoticz.idx_txt = itemp; 
+		
+		itemp = server.arg("dmcz_idx_p1sm").toInt();
+		config.domoticz.idx_p1sm = itemp; 
+		
+		itemp = server.arg("dmcz_idx_crt").toInt();
+		config.domoticz.idx_crt = itemp; 
+		
+		itemp = server.arg("dmcz_idx_elec").toInt();
+		config.domoticz.idx_elec = itemp; 
+		
+		itemp = server.arg("dmcz_idx_kwh").toInt();
+		config.domoticz.idx_kwh = itemp; 
+		
+		itemp = server.arg("dmcz_idx_pct").toInt();
+		config.domoticz.idx_pct = itemp; 
+		
+		itemp = server.arg("dmcz_port").toInt();
+		config.domoticz.port = (itemp>=0 && itemp<=65535) ? itemp : CFG_DMCZ_DEFAULT_PORT ; 
+		itemp = server.arg("dmcz_freq").toInt();
+		if (itemp>0 && itemp<=86400){
+			// domoticz Update if needed
+			Tick_domoticz.detach();
+			Tick_domoticz.attach(itemp, Task_domoticz);
+		} else {
+			itemp = 0 ; 
+		}
+		config.domoticz.freq = itemp;
 
-    if ( saveConfig() ) {
-      ret = 200;
-      response = "OK";
-    } else {
-      ret = 412;
-      response = "Unable to save configuration";
-    }
+		if ( saveConfig() ) {
+			ret = 200;
+			response = "OK";
+		} else {
+			ret = 412;
+			response = "Unable to save configuration";
+		}
 
-    showConfig();
-  }
-  else
-  {
-    ret = 400;
-    response = "Missing Form Field";
-  }
+		showConfig();
+	}
+	else
+	{
+		ret = 400;
+		response = "Missing Form Field";
+	}
 
-  DebugF("Sending response "); 
-  Debug(ret); 
-  Debug(":"); 
-  Debugln(response); 
-  server.send ( ret, "text/plain", response);
-  LedBluOFF();
+	DebugF("Sending response "); 
+	Debug(ret); 
+	Debug(":"); 
+	Debugln(response); 
+	server.send ( ret, "text/plain", response);
+	LedBluOFF();
 }
 
 /* ======================================================================
@@ -317,55 +317,55 @@ Comments: -
 ====================================================================== */
 void handleRoot(void) 
 {
-  LedBluON();
-  handleFileRead("/");
-  LedBluOFF();
+	LedBluON();
+	handleFileRead("/");
+	LedBluOFF();
 }
 
 /* ======================================================================
 Function: formatNumberJSON 
 Purpose : check if data value is full number and send correct JSON format
 Input   : String where to add response
-          char * value to check 
+					char * value to check 
 Output  : - 
 Comments: 00150 => 150
-          ADCO  => "ADCO"
-          1     => 1
+					ADCO  => "ADCO"
+					1     => 1
 ====================================================================== */
 void formatNumberJSON( String &response, char * value)
 {
-  // we have at least something ?
-  if (value && strlen(value))
-  {
-    boolean isNumber = true;
-    // uint8_t c; // Unused Variable
-    char * p = value;
+	// we have at least something ?
+	if (value && strlen(value))
+	{
+		boolean isNumber = true;
+		// uint8_t c; // Unused Variable
+		char * p = value;
 
-    // just to be sure
-    if (strlen(p)<=16) {
-      // check if value is number
-      while (*p && isNumber) {
-        if ( *p < '0' || *p > '9' )
-          isNumber = false;
-        p++;
-      }
+		// just to be sure
+		if (strlen(p)<=16) {
+			// check if value is number
+			while (*p && isNumber) {
+				if ( *p < '0' || *p > '9' )
+					isNumber = false;
+				p++;
+			}
 
-      // this will add "" on not number values
-      if (!isNumber) {
-        response += '\"' ;
-        response += value ;
-        response += F("\"") ;
-      } else {
-        // this will remove leading zero on numbers
-        p = value;
-        while (*p=='0' && *(p+1) )
-          p++;
-        response += p ;
-      }
-    } else {
-      Debugln(F("formatNumberJSON error!"));
-    }
-  }
+			// this will add "" on not number values
+			if (!isNumber) {
+				response += '\"' ;
+				response += value ;
+				response += F("\"") ;
+			} else {
+				// this will remove leading zero on numbers
+				p = value;
+				while (*p=='0' && *(p+1) )
+					p++;
+				response += p ;
+			}
+		} else {
+			Debugln(F("formatNumberJSON error!"));
+		}
+	}
 }
 
 
@@ -373,172 +373,172 @@ void formatNumberJSON( String &response, char * value)
 Function: tinfoJSONTable 
 Purpose : dump all teleinfo values in JSON table format for browser
 Input   : linked list pointer on the concerned data
-          true to dump all values, false for only modified ones
+					true to dump all values, false for only modified ones
 Output  : - 
 Comments: -
 ====================================================================== */
 void tinfoJSONTable(void)
 {
-  ValueList * me = tinfo.getList();
-  String response = "";
+	ValueList * me = tinfo.getList();
+	String response = "";
 
-  // Just to debug where we are
-  Debug(F("Serving /tinfo page...\r\n"));
+	// Just to debug where we are
+	Debug(F("Serving /tinfo page...\r\n"));
 
-  // Got at least one ?
-  if (me) {
-    //uint8_t index=0;  //Unused variable
+	// Got at least one ?
+	if (me) {
+		//uint8_t index=0;  //Unused variable
 
-    boolean first_item = true;
-    // Json start
-    response += F("[\r\n");
+		boolean first_item = true;
+		// Json start
+		response += F("[\r\n");
 
-    // Loop thru the node
-    while (me->next) {
+		// Loop thru the node
+		while (me->next) {
 
-      // we're there
-      ESP.wdtFeed();
+			// we're there
+			ESP.wdtFeed();
 
-      // go to next node
-      me = me->next;
+			// go to next node
+			me = me->next;
 
-      // First item do not add , separator
-      if (first_item)
-        first_item = false;
-      else
-        response += F(",\r\n");
+			// First item do not add , separator
+			if (first_item)
+				first_item = false;
+			else
+				response += F(",\r\n");
 
 /*
-      Debug(F("(")) ;
-      Debug(++index) ;
-      Debug(F(") ")) ;
+			Debug(F("(")) ;
+			Debug(++index) ;
+			Debug(F(") ")) ;
 
-      if (me->name) Debug(me->name) ;
-      else Debug(F("NULL")) ;
+			if (me->name) Debug(me->name) ;
+			else Debug(F("NULL")) ;
 
-      Debug(F("=")) ;
+			Debug(F("=")) ;
 
-      if (me->value) Debug(me->value) ;
-      else Debug(F("NULL")) ;
+			if (me->value) Debug(me->value) ;
+			else Debug(F("NULL")) ;
 
-      Debug(F(" '")) ;
-      Debug(me->checksum) ;
-      Debug(F("' ")); 
+			Debug(F(" '")) ;
+			Debug(me->checksum) ;
+			Debug(F("' ")); 
 
-      // Flags management
-      if ( me->flags) {
-        Debug(F("Flags:0x")); 
-        Debugf("%02X => ", me->flags); 
-        if ( me->flags & TINFO_FLAGS_EXIST)
-          Debug(F("Exist ")) ;
-        if ( me->flags & TINFO_FLAGS_UPDATED)
-          Debug(F("Updated ")) ;
-        if ( me->flags & TINFO_FLAGS_ADDED)
-          Debug(F("New ")) ;
-      }
+			// Flags management
+			if ( me->flags) {
+				Debug(F("Flags:0x")); 
+				Debugf("%02X => ", me->flags); 
+				if ( me->flags & TINFO_FLAGS_EXIST)
+					Debug(F("Exist ")) ;
+				if ( me->flags & TINFO_FLAGS_UPDATED)
+					Debug(F("Updated ")) ;
+				if ( me->flags & TINFO_FLAGS_ADDED)
+					Debug(F("New ")) ;
+			}
 
-      Debugln() ;
+			Debugln() ;
 */
-      response += F("{\"na\":\"");
-      response +=  me->name ;
-      response += F("\", \"va\":\"") ;
-      response += me->value;
-      response += F("\", \"ck\":\"") ;
-      if (me->checksum == '"' || me->checksum == '\\' || me->checksum == '/')
-        response += '\\';
-      response += (char) me->checksum;
-      response += F("\", \"fl\":");
-      response += me->flags ;
+			response += F("{\"na\":\"");
+			response +=  me->name ;
+			response += F("\", \"va\":\"") ;
+			response += me->value;
+			response += F("\", \"ck\":\"") ;
+			if (me->checksum == '"' || me->checksum == '\\' || me->checksum == '/')
+				response += '\\';
+			response += (char) me->checksum;
+			response += F("\", \"fl\":");
+			response += me->flags ;
 
-      //add description,
-      // https://www.enedis.fr/sites/default/files/Enedis-NOI-CPT_54E.pdf
-      // https://www.enedis.fr/sites/default/files/Enedis-NOI-CPT_02E.pdf
-      response += F(", \"de\":\"") ;
-      if(!strcmp(me->name, "ADCO")){
-        response += F("Adresse du compteur");
-      }
-      else if(!strcmp(me->name, "OPTARIF")){
-        response += F("Option Tarifaire");
-      }
-      else if(!strcmp(me->name, "ISOUSC")){
-        response += F("Intensité souscrite");
-      }
-      else if(!strcmp(me->name, "BASE")){
-        response += F("Index option Base");
-      }
-      else if(!strcmp(me->name, "HCHC")){
-        response += F("Heures Creuses");
-      }
-      else if(!strcmp(me->name, "HCHP")){
-        response += F("Heures Pleines");
-      }
-      else if(!strcmp(me->name, "EJPHN")){
-        response += F("Heures Normales");
-      }
-      else if(!strcmp(me->name, "EJPHPM")){
-        response += F("Heures de Pointe Mobile");
-      }
-      else if(!strcmp(me->name, "BBRHCJB")){
-        response += F("Heures Creuses Jours Bleus");
-      }
-      else if(!strcmp(me->name, "BBRHPJB")){
-        response += F("Heures Pleines Jours Bleus");
-      }
-      else if(!strcmp(me->name, "BBRHCJW")){
-        response += F("Heures Creuses Jours Blancs");
-      }
-      else if(!strcmp(me->name, "BBRHPJW")){
-        response += F("Heures Pleines Jours Blancs");
-      }
-      else if(!strcmp(me->name, "BBRHCJR")){
-        response += F("Heures Creuses Jours Rouges");
-      }
-      else if(!strcmp(me->name, "BBRHPJR")){
-        response += F("Heures Pleines Jours Rouges");
-      }
-      else if(!strcmp(me->name, "PEJP")){
-        response += F("Préavis Début EJP (30 min)");
-      }
-      else if(!strcmp(me->name, "PTEC")){
-        response += F("Période Tarifaire en cours");
-      }
-      else if(!strcmp(me->name, "DEMAIN")){
-        response += F("Couleur du lendemain");
-      }
-      else if(!strcmp(me->name, "IINST")){
-        response += F("Intensité Instantanée");
-      }
-      else if(!strcmp(me->name, "ADPS")){
-        response += F("Avertiss. de Dépassement De Puissance Souscrite");
-      }
-      else if(!strcmp(me->name, "IMAX")){
-        response += F("Intensité maximale appelée");
-      }
-      else if(!strcmp(me->name, "PAPP")){
-        response += F("Puissance apparente");
-      }
-      else if(!strcmp(me->name, "HHPHC")){
-        response += F("Horaire HP HC");
-      }
-      else if(!strcmp(me->name, "MOTDETAT")){
-        response += F("Mot d'état du compteur");
-      }
-      response += F("\"") ;
+			//add description,
+			// https://www.enedis.fr/sites/default/files/Enedis-NOI-CPT_54E.pdf
+			// https://www.enedis.fr/sites/default/files/Enedis-NOI-CPT_02E.pdf
+			response += F(", \"de\":\"") ;
+			if(!strcmp(me->name, "ADCO")){
+				response += F("Adresse du compteur");
+			}
+			else if(!strcmp(me->name, "OPTARIF")){
+				response += F("Option Tarifaire");
+			}
+			else if(!strcmp(me->name, "ISOUSC")){
+				response += F("Intensité souscrite");
+			}
+			else if(!strcmp(me->name, "BASE")){
+				response += F("Index option Base");
+			}
+			else if(!strcmp(me->name, "HCHC")){
+				response += F("Heures Creuses");
+			}
+			else if(!strcmp(me->name, "HCHP")){
+				response += F("Heures Pleines");
+			}
+			else if(!strcmp(me->name, "EJPHN")){
+				response += F("Heures Normales");
+			}
+			else if(!strcmp(me->name, "EJPHPM")){
+				response += F("Heures de Pointe Mobile");
+			}
+			else if(!strcmp(me->name, "BBRHCJB")){
+				response += F("Heures Creuses Jours Bleus");
+			}
+			else if(!strcmp(me->name, "BBRHPJB")){
+				response += F("Heures Pleines Jours Bleus");
+			}
+			else if(!strcmp(me->name, "BBRHCJW")){
+				response += F("Heures Creuses Jours Blancs");
+			}
+			else if(!strcmp(me->name, "BBRHPJW")){
+				response += F("Heures Pleines Jours Blancs");
+			}
+			else if(!strcmp(me->name, "BBRHCJR")){
+				response += F("Heures Creuses Jours Rouges");
+			}
+			else if(!strcmp(me->name, "BBRHPJR")){
+				response += F("Heures Pleines Jours Rouges");
+			}
+			else if(!strcmp(me->name, "PEJP")){
+				response += F("Préavis Début EJP (30 min)");
+			}
+			else if(!strcmp(me->name, "PTEC")){
+				response += F("Période Tarifaire en cours");
+			}
+			else if(!strcmp(me->name, "DEMAIN")){
+				response += F("Couleur du lendemain");
+			}
+			else if(!strcmp(me->name, "IINST")){
+				response += F("Intensité Instantanée");
+			}
+			else if(!strcmp(me->name, "ADPS")){
+				response += F("Avertiss. de Dépassement De Puissance Souscrite");
+			}
+			else if(!strcmp(me->name, "IMAX")){
+				response += F("Intensité maximale appelée");
+			}
+			else if(!strcmp(me->name, "PAPP")){
+				response += F("Puissance apparente");
+			}
+			else if(!strcmp(me->name, "HHPHC")){
+				response += F("Horaire HP HC");
+			}
+			else if(!strcmp(me->name, "MOTDETAT")){
+				response += F("Mot d'état du compteur");
+			}
+			response += F("\"") ;
 
 
-      response += '}' ;
+			response += '}' ;
 
-    }
-   // Json end
-   response += F("\r\n]");
+		}
+	 // Json end
+	 response += F("\r\n]");
 
-  } else {
-    Debugln(F("sending 404..."));
-    server.send ( 404, "text/plain", "No data" );
-  }
-  Debug(F("sending..."));
-  server.send ( 200, "text/json", response );
-  Debugln(F("OK!"));
+	} else {
+		Debugln(F("sending 404..."));
+		server.send ( 404, "text/plain", "No data" );
+	}
+	Debug(F("sending..."));
+	server.send ( 200, "text/json", response );
+	Debugln(F("OK!"));
 }
 
 
@@ -551,72 +551,72 @@ Comments: -
 ====================================================================== */
 void logJSONTable(void)
 {
-  String response = "";
-  bool first = true;
+	String response = "";
+	bool first = true;
 
-  // Just to debug where we are
-  Debug(F("Serving /log page...\r\n"));
+	// Just to debug where we are
+	Debug(F("Serving /log page...\r\n"));
 
-    // Json start
-    response += F("[\r\n");
+		// Json start
+		response += F("[\r\n");
 
-    if (config.config & CFG_INFO) 
-    {
+		if (config.config & CFG_INFO) 
+		{
 
-        if (SPIFFS.exists("/log.txt"))
-        {
-          String temp = "";
-          
-          File f = SPIFFS.open("/log.txt", "r");
-          while (f.available()){
-           
-            String tempwhile = "";
-            String line = f.readStringUntil('\n');
-            tempwhile += ",{\"ev\":\"";
-            tempwhile += line.substring(0,line.length()-1);
-            tempwhile += "\"}\r\n";
-            temp = tempwhile + temp;
-            
-          }
-          f.close();
+				if (SPIFFS.exists("/log.txt"))
+				{
+					String temp = "";
+					
+					File f = SPIFFS.open("/log.txt", "r");
+					while (f.available()){
+					 
+						String tempwhile = "";
+						String line = f.readStringUntil('\n');
+						tempwhile += ",{\"ev\":\"";
+						tempwhile += line.substring(0,line.length()-1);
+						tempwhile += "\"}\r\n";
+						temp = tempwhile + temp;
+						
+					}
+					f.close();
 
-          response += ( first ? temp.substring(1,temp.length()-1) : temp );
-        }
-        
-        if (SPIFFS.exists("/log.1"))
-        {
-          String temp = "";
-          
-          File f = SPIFFS.open("/log.1", "r");
-          while (f.available()){
+					response += ( first ? temp.substring(1,temp.length()-1) : temp );
+				}
+				
+				if (SPIFFS.exists("/log.1"))
+				{
+					String temp = "";
+					
+					File f = SPIFFS.open("/log.1", "r");
+					while (f.available()){
 
-            String tempwhile = "";
-            String line = f.readStringUntil('\n');
-            tempwhile += ",{\"ev\":\"";
-            tempwhile += line.substring(0,line.length()-1);
-            tempwhile += "\"}\r\n";
-            temp = tempwhile + temp;
-            
-          }
-          f.close();
+						String tempwhile = "";
+						String line = f.readStringUntil('\n');
+						tempwhile += ",{\"ev\":\"";
+						tempwhile += line.substring(0,line.length()-1);
+						tempwhile += "\"}\r\n";
+						temp = tempwhile + temp;
+						
+					}
+					f.close();
 
-          response += ( first ? temp.substring(1,temp.length()-1) : temp );
-        }
-    }
-    else
-    {
-        response += F("{\"ev\":\"");
-        response +=  "Fonctionnalité non activée" ;
-        response += "\"}" ;
-    }
-    
+					response += ( first ? temp.substring(1,temp.length()-1) : temp );
+				}
+		}
+		else
+		{
+				response += F("{\"ev\":\"");
+				response +=  "Fonctionnalité non activée" ;
+				response += "\"}" ;
+		}
+		
 
-   // Json end
-   response += F("]");
-   
-  Debug(F("sending..."));
-  server.send ( 200, "text/json", response );
-  Debugln(F("OK!"));
+	 // Json end
+	 response += F("]");
+	 
+	Debug(F("sending..."));
+	server.send ( 200, "text/json", response );
+	Debugln(F("OK!"));
 }
 
 
@@ -629,76 +629,76 @@ Comments: -
 ====================================================================== */
 void getSysJSONData(String & response)
 {
-  response = "";
-  char buffer[32];
-  int32_t adc = ( 1000 * analogRead(A0) / 1024 );
+	response = "";
+	char buffer[32];
+	int32_t adc = ( 1000 * analogRead(A0) / 1024 );
 
-  // Json start
-  response += F("[\r\n");
+	// Json start
+	response += F("[\r\n");
 
-  response += "{\"na\":\"Uptime\",\"va\":\"";
-  response += sysinfo.sys_uptime;
-  response += "\"},\r\n";
+	response += "{\"na\":\"Uptime\",\"va\":\"";
+	response += sysinfo.sys_uptime;
+	response += "\"},\r\n";
 
-  response += "{\"na\":\"WifInfo Version\",\"va\":\"" ESPTELEINFO_VERSION "\"},\r\n";
+	response += "{\"na\":\"WifInfo Version\",\"va\":\"" ESPTELEINFO_VERSION "\"},\r\n";
 
-  response += "{\"na\":\"Compile le\",\"va\":\"" __DATE__ " " __TIME__ "\"},\r\n";
+	response += "{\"na\":\"Compile le\",\"va\":\"" __DATE__ " " __TIME__ "\"},\r\n";
 
-  response += "{\"na\":\"SDK Version\",\"va\":\"";
-  response += system_get_sdk_version() ;
-  response += "\"},\r\n";
+	response += "{\"na\":\"SDK Version\",\"va\":\"";
+	response += system_get_sdk_version() ;
+	response += "\"},\r\n";
 
-  response += "{\"na\":\"Chip ID\",\"va\":\"";
-  sprintf_P(buffer, "0x%0X",system_get_chip_id() );
-  response += buffer ;
-  response += "\"},\r\n";
+	response += "{\"na\":\"Chip ID\",\"va\":\"";
+	sprintf_P(buffer, "0x%0X",system_get_chip_id() );
+	response += buffer ;
+	response += "\"},\r\n";
 
-  response += "{\"na\":\"Boot Version\",\"va\":\"";
-  sprintf_P(buffer, "0x%0X",system_get_boot_version() );
-  response += buffer ;
-  response += "\"},\r\n";
+	response += "{\"na\":\"Boot Version\",\"va\":\"";
+	sprintf_P(buffer, "0x%0X",system_get_boot_version() );
+	response += buffer ;
+	response += "\"},\r\n";
 
-  response += "{\"na\":\"Flash Real Size\",\"va\":\"";
-  response += formatSize(ESP.getFlashChipRealSize()) ;
-  response += "\"},\r\n";
+	response += "{\"na\":\"Flash Real Size\",\"va\":\"";
+	response += formatSize(ESP.getFlashChipRealSize()) ;
+	response += "\"},\r\n";
 
-  response += "{\"na\":\"Firmware Size\",\"va\":\"";
-  response += formatSize(ESP.getSketchSize()) ;
-  response += "\"},\r\n";
+	response += "{\"na\":\"Firmware Size\",\"va\":\"";
+	response += formatSize(ESP.getSketchSize()) ;
+	response += "\"},\r\n";
 
-  response += "{\"na\":\"Free Size\",\"va\":\"";
-  response += formatSize(ESP.getFreeSketchSpace()) ;
-  response += "\"},\r\n";
+	response += "{\"na\":\"Free Size\",\"va\":\"";
+	response += formatSize(ESP.getFreeSketchSpace()) ;
+	response += "\"},\r\n";
 
-  response += "{\"na\":\"Analog\",\"va\":\"";
-  adc = ( (1000 * analogRead(A0)) / 1024);
-  sprintf_P( buffer, PSTR("%d mV"), adc);
-  response += buffer ;
-  response += "\"},\r\n";
+	response += "{\"na\":\"Analog\",\"va\":\"";
+	adc = ( (1000 * analogRead(A0)) / 1024);
+	sprintf_P( buffer, PSTR("%d mV"), adc);
+	response += buffer ;
+	response += "\"},\r\n";
 
-  FSInfo info;
-  SPIFFS.info(info);
+	FSInfo info;
+	SPIFFS.info(info);
 
-  response += "{\"na\":\"SPIFFS Total\",\"va\":\"";
-  response += formatSize(info.totalBytes) ;
-  response += "\"},\r\n";
+	response += "{\"na\":\"SPIFFS Total\",\"va\":\"";
+	response += formatSize(info.totalBytes) ;
+	response += "\"},\r\n";
 
-  response += "{\"na\":\"SPIFFS Used\",\"va\":\"";
-  response += formatSize(info.usedBytes) ;
-  response += "\"},\r\n";
+	response += "{\"na\":\"SPIFFS Used\",\"va\":\"";
+	response += formatSize(info.usedBytes) ;
+	response += "\"},\r\n";
 
-  response += "{\"na\":\"SPIFFS Occupation\",\"va\":\"";
-  sprintf_P(buffer, "%d%%",100*info.usedBytes/info.totalBytes);
-  response += buffer ;
-  response += "\"},\r\n"; 
+	response += "{\"na\":\"SPIFFS Occupation\",\"va\":\"";
+	sprintf_P(buffer, "%d%%",100*info.usedBytes/info.totalBytes);
+	response += buffer ;
+	response += "\"},\r\n"; 
 
-  // Free mem should be last one 
-  response += "{\"na\":\"Free Ram\",\"va\":\"";
-  response += formatSize(system_get_free_heap_size()) ;
-  response += "\"}\r\n"; // Last don't have comma at end
+	// Free mem should be last one 
+	response += "{\"na\":\"Free Ram\",\"va\":\"";
+	response += formatSize(system_get_free_heap_size()) ;
+	response += "\"}\r\n"; // Last don't have comma at end
 
-  // Json end
-  response += F("]\r\n");
+	// Json end
+	response += F("]\r\n");
 }
 
 /* ======================================================================
@@ -710,14 +710,14 @@ Comments: -
 ====================================================================== */
 void sysJSONTable()
 {
-  String response = "";
-  
-  getSysJSONData(response);
+	String response = "";
+	
+	getSysJSONData(response);
 
-  // Just to debug where we are
-  Debug(F("Serving /system page..."));
-  server.send ( 200, "text/json", response );
-  Debugln(F("Ok!"));
+	// Just to debug where we are
+	Debug(F("Serving /system page..."));
+	server.send ( 200, "text/json", response );
+	Debugln(F("Ok!"));
 }
 
 
@@ -731,54 +731,54 @@ Comments: -
 ====================================================================== */
 void getConfJSONData(String & r)
 {
-  // Json start
-  r = FPSTR(FP_JSON_START); 
+	// Json start
+	r = FPSTR(FP_JSON_START); 
 
-  r+="\"";
-  r+=CFG_FORM_SSID;      r+=FPSTR(FP_QCQ); r+=config.ssid;           r+= FPSTR(FP_QCNL); 
-  r+=CFG_FORM_PSK;       r+=FPSTR(FP_QCQ); r+=config.psk;            r+= FPSTR(FP_QCNL); 
-  r+=CFG_FORM_HOST;      r+=FPSTR(FP_QCQ); r+=config.host;           r+= FPSTR(FP_QCNL); 
-  r+=CFG_FORM_AP_PSK;    r+=FPSTR(FP_QCQ); r+=config.ap_psk;         r+= FPSTR(FP_QCNL); 
-  r+=CFG_FORM_AP_RETCNT; r+=FPSTR(FP_QCQ); r+=config.ap_retrycount;  r+= FPSTR(FP_QCNL);
-  
-  r+=CFG_FORM_EMON_HOST; r+=FPSTR(FP_QCQ); r+=config.emoncms.host;   r+= FPSTR(FP_QCNL); 
-  r+=CFG_FORM_EMON_PORT; r+=FPSTR(FP_QCQ); r+=config.emoncms.port;   r+= FPSTR(FP_QCNL); 
-  r+=CFG_FORM_EMON_URL;  r+=FPSTR(FP_QCQ); r+=config.emoncms.url;    r+= FPSTR(FP_QCNL); 
-  r+=CFG_FORM_EMON_KEY;  r+=FPSTR(FP_QCQ); r+=config.emoncms.apikey; r+= FPSTR(FP_QCNL); 
-  r+=CFG_FORM_EMON_NODE; r+=FPSTR(FP_QCQ); r+=config.emoncms.node;   r+= FPSTR(FP_QCNL); 
-  r+=CFG_FORM_EMON_FREQ; r+=FPSTR(FP_QCQ); r+=config.emoncms.freq;   r+= FPSTR(FP_QCNL); 
-  
-  r+=CFG_FORM_OTA_AUTH;  r+=FPSTR(FP_QCQ); r+=config.ota_auth;       r+= FPSTR(FP_QCNL); 
-  r+=CFG_FORM_OTA_PORT;  r+=FPSTR(FP_QCQ); r+=config.ota_port;       r+= FPSTR(FP_QCNL);
-  
-  if (config.config & CFG_DEBUG)   { r+=CFG_FORM_CFG_DEBUG;  r+=FPSTR(FP_QCQ); r+= FPSTR(FP_QCNL); }
-  if (config.config & CFG_INFO)    { r+=CFG_FORM_CFG_INFO;   r+=FPSTR(FP_QCQ); r+= FPSTR(FP_QCNL); }
-  if (config.config & CFG_RGB_LED) { r+=CFG_FORM_CFG_RGB;    r+=FPSTR(FP_QCQ); r+= FPSTR(FP_QCNL); }
-  if (config.config & CFG_LCD)     { r+=CFG_FORM_CFG_OLED;   r+=FPSTR(FP_QCQ); r+= FPSTR(FP_QCNL); }
+	r+="\"";
+	r+=CFG_FORM_SSID;      r+=FPSTR(FP_QCQ); r+=config.ssid;           r+= FPSTR(FP_QCNL); 
+	r+=CFG_FORM_PSK;       r+=FPSTR(FP_QCQ); r+=config.psk;            r+= FPSTR(FP_QCNL); 
+	r+=CFG_FORM_HOST;      r+=FPSTR(FP_QCQ); r+=config.host;           r+= FPSTR(FP_QCNL); 
+	r+=CFG_FORM_AP_PSK;    r+=FPSTR(FP_QCQ); r+=config.ap_psk;         r+= FPSTR(FP_QCNL); 
+	r+=CFG_FORM_AP_RETCNT; r+=FPSTR(FP_QCQ); r+=config.ap_retrycount;  r+= FPSTR(FP_QCNL);
+	
+	r+=CFG_FORM_EMON_HOST; r+=FPSTR(FP_QCQ); r+=config.emoncms.host;   r+= FPSTR(FP_QCNL); 
+	r+=CFG_FORM_EMON_PORT; r+=FPSTR(FP_QCQ); r+=config.emoncms.port;   r+= FPSTR(FP_QCNL); 
+	r+=CFG_FORM_EMON_URL;  r+=FPSTR(FP_QCQ); r+=config.emoncms.url;    r+= FPSTR(FP_QCNL); 
+	r+=CFG_FORM_EMON_KEY;  r+=FPSTR(FP_QCQ); r+=config.emoncms.apikey; r+= FPSTR(FP_QCNL); 
+	r+=CFG_FORM_EMON_NODE; r+=FPSTR(FP_QCQ); r+=config.emoncms.node;   r+= FPSTR(FP_QCNL); 
+	r+=CFG_FORM_EMON_FREQ; r+=FPSTR(FP_QCQ); r+=config.emoncms.freq;   r+= FPSTR(FP_QCNL); 
+	
+	r+=CFG_FORM_OTA_AUTH;  r+=FPSTR(FP_QCQ); r+=config.ota_auth;       r+= FPSTR(FP_QCNL); 
+	r+=CFG_FORM_OTA_PORT;  r+=FPSTR(FP_QCQ); r+=config.ota_port;       r+= FPSTR(FP_QCNL);
+	
+	if (config.config & CFG_DEBUG)   { r+=CFG_FORM_CFG_DEBUG;  r+=FPSTR(FP_QCQ); r+= FPSTR(FP_QCNL); }
+	if (config.config & CFG_INFO)    { r+=CFG_FORM_CFG_INFO;   r+=FPSTR(FP_QCQ); r+= FPSTR(FP_QCNL); }
+	if (config.config & CFG_RGB_LED) { r+=CFG_FORM_CFG_RGB;    r+=FPSTR(FP_QCQ); r+= FPSTR(FP_QCNL); }
+	if (config.config & CFG_LCD)     { r+=CFG_FORM_CFG_OLED;   r+=FPSTR(FP_QCQ); r+= FPSTR(FP_QCNL); }
 
-  r+=CFG_FORM_DMCZ_HOST;     r+=FPSTR(FP_QCQ); r+=config.domoticz.host;     r+= FPSTR(FP_QCNL); 
-  r+=CFG_FORM_DMCZ_PORT;     r+=FPSTR(FP_QCQ); r+=config.domoticz.port;     r+= FPSTR(FP_QCNL); 
-  r+=CFG_FORM_DMCZ_URL;      r+=FPSTR(FP_QCQ); r+=config.domoticz.url;      r+= FPSTR(FP_QCNL); 
-  r+=CFG_FORM_DMCZ_USR;      r+=FPSTR(FP_QCQ); r+=config.domoticz.usr;      r+= FPSTR(FP_QCNL); 
-  r+=CFG_FORM_DMCZ_PWD;      r+=FPSTR(FP_QCQ); r+=config.domoticz.pwd;      r+= FPSTR(FP_QCNL); 
-  r+=CFG_FORM_DMCZ_IDX_TXT;  r+=FPSTR(FP_QCQ); r+=config.domoticz.idx_txt;  r+= FPSTR(FP_QCNL); 
-  r+=CFG_FORM_DMCZ_IDX_P1SM; r+=FPSTR(FP_QCQ); r+=config.domoticz.idx_p1sm; r+= FPSTR(FP_QCNL); 
-  r+=CFG_FORM_DMCZ_IDX_CRT;  r+=FPSTR(FP_QCQ); r+=config.domoticz.idx_crt;  r+= FPSTR(FP_QCNL); 
-  r+=CFG_FORM_DMCZ_IDX_ELEC; r+=FPSTR(FP_QCQ); r+=config.domoticz.idx_elec; r+= FPSTR(FP_QCNL); 
-  r+=CFG_FORM_DMCZ_IDX_KWH;  r+=FPSTR(FP_QCQ); r+=config.domoticz.idx_kwh;  r+= FPSTR(FP_QCNL); 
-  r+=CFG_FORM_DMCZ_IDX_PCT;  r+=FPSTR(FP_QCQ); r+=config.domoticz.idx_pct;  r+= FPSTR(FP_QCNL); 
-  r+=CFG_FORM_DMCZ_FREQ;     r+=FPSTR(FP_QCQ); r+=config.domoticz.freq;     r+= FPSTR(FP_QCNL); 
+	r+=CFG_FORM_DMCZ_HOST;     r+=FPSTR(FP_QCQ); r+=config.domoticz.host;     r+= FPSTR(FP_QCNL); 
+	r+=CFG_FORM_DMCZ_PORT;     r+=FPSTR(FP_QCQ); r+=config.domoticz.port;     r+= FPSTR(FP_QCNL); 
+	r+=CFG_FORM_DMCZ_URL;      r+=FPSTR(FP_QCQ); r+=config.domoticz.url;      r+= FPSTR(FP_QCNL); 
+	r+=CFG_FORM_DMCZ_USR;      r+=FPSTR(FP_QCQ); r+=config.domoticz.usr;      r+= FPSTR(FP_QCNL); 
+	r+=CFG_FORM_DMCZ_PWD;      r+=FPSTR(FP_QCQ); r+=config.domoticz.pwd;      r+= FPSTR(FP_QCNL); 
+	r+=CFG_FORM_DMCZ_IDX_TXT;  r+=FPSTR(FP_QCQ); r+=config.domoticz.idx_txt;  r+= FPSTR(FP_QCNL); 
+	r+=CFG_FORM_DMCZ_IDX_P1SM; r+=FPSTR(FP_QCQ); r+=config.domoticz.idx_p1sm; r+= FPSTR(FP_QCNL); 
+	r+=CFG_FORM_DMCZ_IDX_CRT;  r+=FPSTR(FP_QCQ); r+=config.domoticz.idx_crt;  r+= FPSTR(FP_QCNL); 
+	r+=CFG_FORM_DMCZ_IDX_ELEC; r+=FPSTR(FP_QCQ); r+=config.domoticz.idx_elec; r+= FPSTR(FP_QCNL); 
+	r+=CFG_FORM_DMCZ_IDX_KWH;  r+=FPSTR(FP_QCQ); r+=config.domoticz.idx_kwh;  r+= FPSTR(FP_QCNL); 
+	r+=CFG_FORM_DMCZ_IDX_PCT;  r+=FPSTR(FP_QCQ); r+=config.domoticz.idx_pct;  r+= FPSTR(FP_QCNL); 
+	r+=CFG_FORM_DMCZ_FREQ;     r+=FPSTR(FP_QCQ); r+=config.domoticz.freq;     r+= FPSTR(FP_QCNL); 
 
-  r+=CFG_FORM_JDOM_HOST; r+=FPSTR(FP_QCQ); r+=config.jeedom.host;   r+= FPSTR(FP_QCNL); 
-  r+=CFG_FORM_JDOM_PORT; r+=FPSTR(FP_QCQ); r+=config.jeedom.port;   r+= FPSTR(FP_QCNL); 
-  r+=CFG_FORM_JDOM_URL;  r+=FPSTR(FP_QCQ); r+=config.jeedom.url;    r+= FPSTR(FP_QCNL); 
-  r+=CFG_FORM_JDOM_KEY;  r+=FPSTR(FP_QCQ); r+=config.jeedom.apikey; r+= FPSTR(FP_QCNL); 
-  r+=CFG_FORM_JDOM_ADCO; r+=FPSTR(FP_QCQ); r+=config.jeedom.adco;   r+= FPSTR(FP_QCNL); 
-  r+=CFG_FORM_JDOM_FREQ; r+=FPSTR(FP_QCQ); r+=config.jeedom.freq;  
+	r+=CFG_FORM_JDOM_HOST; r+=FPSTR(FP_QCQ); r+=config.jeedom.host;   r+= FPSTR(FP_QCNL); 
+	r+=CFG_FORM_JDOM_PORT; r+=FPSTR(FP_QCQ); r+=config.jeedom.port;   r+= FPSTR(FP_QCNL); 
+	r+=CFG_FORM_JDOM_URL;  r+=FPSTR(FP_QCQ); r+=config.jeedom.url;    r+= FPSTR(FP_QCNL); 
+	r+=CFG_FORM_JDOM_KEY;  r+=FPSTR(FP_QCQ); r+=config.jeedom.apikey; r+= FPSTR(FP_QCNL); 
+	r+=CFG_FORM_JDOM_ADCO; r+=FPSTR(FP_QCQ); r+=config.jeedom.adco;   r+= FPSTR(FP_QCNL); 
+	r+=CFG_FORM_JDOM_FREQ; r+=FPSTR(FP_QCQ); r+=config.jeedom.freq;  
 
-  r+= F("\""); 
-  // Json end
-  r += FPSTR(FP_JSON_END);
+	r+= F("\""); 
+	// Json end
+	r += FPSTR(FP_JSON_END);
 
 }
 
@@ -791,12 +791,12 @@ Comments: -
 ====================================================================== */
 void confJSONTable()
 {
-  String response = "";
-  getConfJSONData(response);
-  // Just to debug where we are
-  Debug(F("Serving /config page..."));
-  server.send ( 200, "text/json", response );
-  Debugln(F("Ok!"));
+	String response = "";
+	getConfJSONData(response);
+	// Just to debug where we are
+	Debug(F("Serving /config page..."));
+	server.send ( 200, "text/json", response );
+	Debugln(F("Ok!"));
 }
 
 /* ======================================================================
@@ -808,52 +808,52 @@ Comments: -
 ====================================================================== */
 void getSpiffsJSONData(String & response)
 {
-  //char buffer[32]; // Unused Variable
-  bool first_item = true;
+	//char buffer[32]; // Unused Variable
+	bool first_item = true;
 
-  // Json start
-  response = FPSTR(FP_JSON_START);
+	// Json start
+	response = FPSTR(FP_JSON_START);
 
-  // Files Array  
-  response += F("\"files\":[\r\n");
+	// Files Array  
+	response += F("\"files\":[\r\n");
 
-  // Loop trough all files
-  Dir dir = SPIFFS.openDir("/");
-  while (dir.next()) {    
-    String fileName = dir.fileName();
-    size_t fileSize = dir.fileSize();
-    if (first_item)  
-      first_item=false;
-    else
-      response += ",";
+	// Loop trough all files
+	Dir dir = SPIFFS.openDir("/");
+	while (dir.next()) {    
+		String fileName = dir.fileName();
+		size_t fileSize = dir.fileSize();
+		if (first_item)  
+			first_item=false;
+		else
+			response += ",";
 
-    response += F("{\"na\":\"");
-    response += fileName.c_str();
-    response += F("\",\"va\":\"");
-    response += fileSize;
-    response += F("\",\"act\":\"");
-    response += fileName.c_str();
-    response += F("\"}\r\n");
-  }
-  response += F("],\r\n");
+		response += F("{\"na\":\"");
+		response += fileName.c_str();
+		response += F("\",\"va\":\"");
+		response += fileSize;
+		response += F("\",\"act\":\"");
+		response += fileName.c_str();
+		response += F("\"}\r\n");
+	}
+	response += F("],\r\n");
 
 
-  // SPIFFS File system array
-  response += F("\"spiffs\":[\r\n{");
-  
-  // Get SPIFFS File system informations
-  FSInfo info;
-  SPIFFS.info(info);
-  response += F("\"Total\":");
-  response += info.totalBytes ;
-  response += F(", \"Used\":");
-  response += info.usedBytes ;
-  response += F(", \"Ram\":");
-  response += system_get_free_heap_size() ;
-  response += F("}\r\n]"); 
+	// SPIFFS File system array
+	response += F("\"spiffs\":[\r\n{");
+	
+	// Get SPIFFS File system informations
+	FSInfo info;
+	SPIFFS.info(info);
+	response += F("\"Total\":");
+	response += info.totalBytes ;
+	response += F(", \"Used\":");
+	response += info.usedBytes ;
+	response += F(", \"Ram\":");
+	response += system_get_free_heap_size() ;
+	response += F("}\r\n]"); 
 
-  // Json end
-  response += FPSTR(FP_JSON_END);
+	// Json end
+	response += FPSTR(FP_JSON_END);
 }
 
 /* ======================================================================
@@ -865,47 +865,47 @@ Comments: -
 ====================================================================== */
 void spiffsJSONTable()
 {
-  String response = "";
-  getSpiffsJSONData(response);
-  server.send ( 200, "text/json", response );
+	String response = "";
+	getSpiffsJSONData(response);
+	server.send ( 200, "text/json", response );
 }
 
 /* ======================================================================
 Function: sendJSON 
 Purpose : dump all values in JSON
 Input   : linked list pointer on the concerned data
-          true to dump all values, false for only modified ones
+					true to dump all values, false for only modified ones
 Output  : - 
 Comments: -
 ====================================================================== */
 void sendJSON(void)
 {
-  ValueList * me = tinfo.getList();
-  String response = "";
-  
-  // Got at least one ?
-  if (me) {
-    // Json start
-    response += FPSTR(FP_JSON_START);
-    response += F("\"_UPTIME\":");
-    response += seconds;
+	ValueList * me = tinfo.getList();
+	String response = "";
+	
+	// Got at least one ?
+	if (me) {
+		// Json start
+		response += FPSTR(FP_JSON_START);
+		response += F("\"_UPTIME\":");
+		response += seconds;
 
-    // Loop thru the node
-    while (me->next) {
-      // go to next node
-      me = me->next;
-      response += F(",\"") ;
-      response += me->name ;
-      response += F("\":") ;
-      formatNumberJSON(response, me->value);
-    }
-   // Json end
-   response += FPSTR(FP_JSON_END) ;
+		// Loop thru the node
+		while (me->next) {
+			// go to next node
+			me = me->next;
+			response += F(",\"") ;
+			response += me->name ;
+			response += F("\":") ;
+			formatNumberJSON(response, me->value);
+		}
+	 // Json end
+	 response += FPSTR(FP_JSON_END) ;
 
-  } else {
-    server.send ( 404, "text/plain", "No data" );
-  }
-  server.send ( 200, "text/json", response );
+	} else {
+		server.send ( 404, "text/plain", "No data" );
+	}
+	server.send ( 200, "text/json", response );
 }
 
 
@@ -918,46 +918,46 @@ Comments: -
 ====================================================================== */
 void wifiScanJSON(void)
 {
-  String response = "";
-  bool first = true;
+	String response = "";
+	bool first = true;
 
-  // Just to debug where we are
-  Debug(F("Serving /wifiscan page..."));
+	// Just to debug where we are
+	Debug(F("Serving /wifiscan page..."));
 
-  int n = WiFi.scanNetworks();
+	int n = WiFi.scanNetworks();
 
-  // Json start
-  response += F("[\r\n");
+	// Json start
+	response += F("[\r\n");
 
-  for (uint8_t i = 0; i < n; ++i)
-  {
-    int8_t rssi = WiFi.RSSI(i);
-    
-    uint8_t percent;
+	for (uint8_t i = 0; i < n; ++i)
+	{
+		int8_t rssi = WiFi.RSSI(i);
+		
+		uint8_t percent;
 
-    // dBm to Quality
-    if(rssi<=-100)      percent = 0;
-    else if (rssi>=-50) percent = 100;
-    else                percent = 2 * (rssi + 100);
+		// dBm to Quality
+		if(rssi<=-100)      percent = 0;
+		else if (rssi>=-50) percent = 100;
+		else                percent = 2 * (rssi + 100);
 
-    if (first) 
-      first = false;
-    else
-      response += F(",");
+		if (first) 
+			first = false;
+		else
+			response += F(",");
 
-    response += F("{\"ssid\":\"");
-    response += WiFi.SSID(i);
-    response += F("\",\"rssi\":") ;
-    response += rssi;
-    response += FPSTR(FP_JSON_END);
-  }
+		response += F("{\"ssid\":\"");
+		response += WiFi.SSID(i);
+		response += F("\",\"rssi\":") ;
+		response += rssi;
+		response += FPSTR(FP_JSON_END);
+	}
 
-  // Json end
-  response += FPSTR("]\r\n");
+	// Json end
+	response += FPSTR("]\r\n");
 
-  Debug(F("sending..."));
-  server.send ( 200, "text/json", response );
-  Debugln(F("Ok!"));
+	Debug(F("sending..."));
+	server.send ( 200, "text/json", response );
+	Debugln(F("Ok!"));
 }
 
 /* ======================================================================
@@ -969,17 +969,17 @@ Comments: -
 ====================================================================== */
 void handleFactoryReset(void)
 {
-  // Just to debug where we are
-  Debug(F("Serving /factory_reset page..."));
-  ResetConfig();
-  ESP.eraseConfig();
-  Debug(F("sending..."));
-  server.send ( 200, "text/plain", FPSTR(FP_RESTART) );
-  Debugln(F("Ok!"));
-  delay(1000);
-  ESP.restart();
-  while (true)
-    delay(1);
+	// Just to debug where we are
+	Debug(F("Serving /factory_reset page..."));
+	ResetConfig();
+	ESP.eraseConfig();
+	Debug(F("sending..."));
+	server.send ( 200, "text/plain", FPSTR(FP_RESTART) );
+	Debugln(F("Ok!"));
+	delay(1000);
+	ESP.restart();
+	while (true)
+		delay(1);
 }
 
 /* ======================================================================
@@ -991,15 +991,15 @@ Comments: -
 ====================================================================== */
 void handleReset(void)
 {
-  // Just to debug where we are
-  Debug(F("Serving /reset page..."));
-  Debug(F("sending..."));
-  server.send ( 200, "text/plain", FPSTR(FP_RESTART) );
-  Debugln(F("Ok!"));
-  delay(1000);
-  ESP.restart();
-  while (true)
-    delay(1);
+	// Just to debug where we are
+	Debug(F("Serving /reset page..."));
+	Debug(F("sending..."));
+	server.send ( 200, "text/plain", FPSTR(FP_RESTART) );
+	Debugln(F("Ok!"));
+	delay(1000);
+	ESP.restart();
+	while (true)
+		delay(1);
 
 }
 
@@ -1013,75 +1013,75 @@ Comments: -
 ====================================================================== */
 void handleNotFound(void) 
 {
-  String response = "";
-  boolean found = false;  
+	String response = "";
+	boolean found = false;  
 
-  // Led on
-  LedBluON();
+	// Led on
+	LedBluON();
 
-  // try to return SPIFFS file
-  found = handleFileRead(server.uri());
+	// try to return SPIFFS file
+	found = handleFileRead(server.uri());
 
-  // Try Teleinfo ETIQUETTE
-  if (!found) {
-    // We check for an known label
-    ValueList * me = tinfo.getList();
-    const char * uri;
-    // convert uri to char * for compare
-    uri = server.uri().c_str();
+	// Try Teleinfo ETIQUETTE
+	if (!found) {
+		// We check for an known label
+		ValueList * me = tinfo.getList();
+		const char * uri;
+		// convert uri to char * for compare
+		uri = server.uri().c_str();
 
-    Debugf("handleNotFound(%s)\r\n", uri);
+		Debugf("handleNotFound(%s)\r\n", uri);
 
-    // Got at least one and consistent URI ?
-    if (me && uri && *uri=='/' && *++uri ) {
-      
-      // Loop thru the linked list of values
-      while (me->next && !found) {
+		// Got at least one and consistent URI ?
+		if (me && uri && *uri=='/' && *++uri ) {
+			
+			// Loop thru the linked list of values
+			while (me->next && !found) {
 
-        // go to next node
-        me = me->next;
+				// go to next node
+				me = me->next;
 
-        //Debugf("compare to '%s' ", me->name);
-        // Do we have this one ?
-        if (strcmp (me->name, uri) == 0 )
-        {
-          // no need to continue
-          found = true;
+				//Debugf("compare to '%s' ", me->name);
+				// Do we have this one ?
+				if (strcmp (me->name, uri) == 0 )
+				{
+					// no need to continue
+					found = true;
 
-          // Add to respone
-          response += F("{\"") ;
-          response += me->name ;
-          response += F("\":") ;
-          formatNumberJSON(response, me->value);
-          response += F("}\r\n");
-        }
-      }
-    }
+					// Add to respone
+					response += F("{\"") ;
+					response += me->name ;
+					response += F("\":") ;
+					formatNumberJSON(response, me->value);
+					response += F("}\r\n");
+				}
+			}
+		}
 
-    // Got it, send json
-    if (found) 
-      server.send ( 200, "text/json", response );
-  }
+		// Got it, send json
+		if (found) 
+			server.send ( 200, "text/json", response );
+	}
 
-  // All trys failed
-  if (!found) {
-    // send error message in plain text
-    String message = F("File Not Found\n\n");
-    message += F("URI: ");
-    message += server.uri();
-    message += F("\nMethod: ");
-    message += ( server.method() == HTTP_GET ) ? "GET" : "POST";
-    message += F("\nArguments: ");
-    message += server.args();
-    message += FPSTR(FP_NL);
+	// All trys failed
+	if (!found) {
+		// send error message in plain text
+		String message = F("File Not Found\n\n");
+		message += F("URI: ");
+		message += server.uri();
+		message += F("\nMethod: ");
+		message += ( server.method() == HTTP_GET ) ? "GET" : "POST";
+		message += F("\nArguments: ");
+		message += server.args();
+		message += FPSTR(FP_NL);
 
-    for ( uint8_t i = 0; i < server.args(); i++ ) {
-      message += " " + server.argName ( i ) + ": " + server.arg ( i ) + FPSTR(FP_NL);
-    }
+		for ( uint8_t i = 0; i < server.args(); i++ ) {
+			message += " " + server.argName ( i ) + ": " + server.arg ( i ) + FPSTR(FP_NL);
+		}
 
-    server.send ( 404, "text/plain", message );
-  }
+		server.send ( 404, "text/plain", message );
+	}
 
-  // Led off
-  LedBluOFF();
+	// Led off
+	LedBluOFF();
 }
