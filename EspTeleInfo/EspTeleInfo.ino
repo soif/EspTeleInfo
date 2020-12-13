@@ -47,6 +47,7 @@
 #include <Wire.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
+#include <RGBLed.h>
 
 // Global project file
 #include "EspTeleInfo.h"
@@ -68,17 +69,13 @@ bool ota_blink;
 // Teleinfo
 TInfo tinfo;
 
-// RGB Led
-#ifdef RGB_LED_PIN
-//NeoPixelBus rgb_led = NeoPixelBus(1, RGB_LED_PIN, NEO_RGB | NEO_KHZ800);
-//NeoPixelBus<NeoGrbFeature, NeoEsp8266BitBang800KbpsMethod> rgb_led(1, RGB_LED_PIN);
-NeoPixelBus<NeoRgbFeature, NeoEsp8266BitBang800KbpsMethod> rgb_led(1, RGB_LED_PIN);
-#endif
 
 //OLED
 Adafruit_SSD1306 oled(OLED_WIDTH, OLED_HEIGHT, &Wire, -1);
 bool oled_inited =false;
 
+//RGB LED
+RGBLed rgbled(RGB_LED_PIN_R, RGB_LED_PIN_G, RGB_LED_PIN_B, RGBLed::COMMON_CATHODE);
 
 // define whole brigtness level for RGBLED (50%)
 uint8_t rgb_brightness = 50;
@@ -106,8 +103,7 @@ Purpose : update sysinfo variables
 Input   : true if first call
 					true if needed to print on serial debug
 ====================================================================== */
-void UpdateSysinfo(boolean first_call, boolean show_debug)
-{
+void UpdateSysinfo(boolean first_call, boolean show_debug) {
 	char buff[64];
 	//int32_t adc;  // Unused Variable
 	int sec = seconds;
@@ -122,8 +118,7 @@ void UpdateSysinfo(boolean first_call, boolean show_debug)
 Function: Task_1_Sec 
 Purpose : update our second ticker
 ====================================================================== */
-void Task_1_Sec()
-{
+void Task_1_Sec() {
 	task_1_sec = true;
 	seconds++;
 }
@@ -133,8 +128,7 @@ Function: Task_emoncms
 Purpose : callback of emoncms ticker
 Comments: Like an Interrupt, need to be short, we set flag for main loop
 ====================================================================== */
-void Task_emoncms()
-{
+void Task_emoncms() {
 	task_emoncms = true;
 }
 
@@ -143,8 +137,7 @@ Function: Task_jeedom
 Purpose : callback of jeedom ticker
 Comments: Like an Interrupt, need to be short, we set flag for main loop
 ====================================================================== */
-void Task_jeedom()
-{
+void Task_jeedom() {
 	task_jeedom = true;
 }
 
@@ -159,61 +152,19 @@ void Task_domoticz()
 }
 
 /* ======================================================================
-Function: LedOff 
+Function: LedRedOn 
+====================================================================== */
+void LedRedOn(){
+	digitalWrite(RED_LED_PIN, 1);
+}
+
+/* ======================================================================
+Function: LedRedOff 
 Purpose : callback called after led blink delay
-Input   : led (defined in term of PIN)
 ====================================================================== */
-void LedOff(int led)
-{
-	#ifdef BLU_LED_PIN
-	if (led==BLU_LED_PIN)
-		LedBluOFF();
-	#endif
-	if (led==RED_LED_PIN)
-		LedRedOFF();
-	if (led==RGB_LED_PIN)
-		LedRGBOFF();
+void LedRedOff(){
+	digitalWrite(RED_LED_PIN, 0);
 }
-
-
-// Light off the RGB LED
-#ifdef RGB_LED_PIN
-/* ======================================================================
-Function: LedRGBON
-Purpose : Light RGB Led with HSB value
-Input   : Hue (0..255)
-					Saturation (0..255)
-					Brightness (0..255)
-====================================================================== */
-void LedRGBON (uint16_t hue)
-{
-	if (config.config & CFG_RGB_LED) {
-		// Convert to neoPixel API values
-		// H (is color from 0..360) should be between 0.0 and 1.0
-		// L (is brightness from 0..100) should be between 0.0 and 0.5
-		RgbColor target = HslColor( hue / 360.0f, 1.0f, rgb_brightness * 0.005f );    
-
-			// Set RGB Led
-		rgb_led.SetPixelColor(0, target); 
-		rgb_led.Show();
-	}
-}
-
-/* ======================================================================
-Function: LedRGBOFF 
-Purpose : light off the RGN LED
-====================================================================== */
-//void LedOff(int led)
-void LedRGBOFF(void)
-{
-	if (config.config & CFG_RGB_LED) {
-		rgb_led.SetPixelColor(0,RgbColor(0)); 
-		rgb_led.Show();
-	}
-}
-
-#endif
-
 
 /* ======================================================================
 Function: ADPSCallback 
@@ -226,12 +177,12 @@ Input   : phase number
 Comments: should have been initialised in the main sketch with a
 					tinfo.attachADPSCallback(ADPSCallback())
 ====================================================================== */
-void ADPSCallback(uint8_t phase)
-{
+void ADPSCallback(uint8_t phase) {
 	// Monophasé
 	if (phase == 0 ) {
 		Debugln(F("ADPS"));
-	} else {
+	} 
+	else {
 		Debug(F("ADPS Phase "));
 		Debugln('0' + phase);
 	}
@@ -243,8 +194,7 @@ Purpose : callback when we detected new or modified data received
 Input   : linked list pointer on the concerned data
 					value current state being TINFO_VALUE_ADDED/TINFO_VALUE_UPDATED
 ====================================================================== */
-void DataCallback(ValueList * me, uint8_t flags)
-{
+void DataCallback(ValueList * me, uint8_t flags) {
 
 	// This is for simulating ADPS during my tests
 	// ===========================================
@@ -284,17 +234,19 @@ Function: NewFrame
 Purpose : callback when we received a complete teleinfo frame
 Input   : linked list pointer on the concerned data
 ====================================================================== */
-void NewFrame(ValueList * me) 
-{
+void NewFrame(ValueList * me) {
 	char buff[32];
-
-	// Light the RGB LED 
+	
+	//to implements
 	if ( config.config & CFG_RGB_LED) {
-		LedRGBON(COLOR_GREEN);
-		
-		// led off after delay
-		rgb_ticker.once_ms( (uint32_t) BLINK_LED_MS, LedOff, (int) RGB_LED_PIN);
+
 	}
+
+	// Light the RED LED 
+	LedRedOn();
+		
+	// led off after delay
+	rgb_ticker.once_ms( (uint32_t) BLINK_LED_NEW_MS, LedRedOff);
 
 	sprintf_P( buff, PSTR("New Frame (%ld Bytes free)"), ESP.getFreeHeap() );
 	Debugln(buff);
@@ -307,17 +259,14 @@ Input   : linked list pointer on the concerned data
 Comments: it's called only if one data in the frame is different than
 					the previous frame
 ====================================================================== */
-void UpdatedFrame(ValueList * me)
-{
+void UpdatedFrame(ValueList * me) {
 	char buff[32];
 	
 	// Light the RGB LED (purple)
-	if ( config.config & CFG_RGB_LED) {
-		LedRGBON(COLOR_MAGENTA);
+	LedRedOn();
 
 		// led off after delay
-		rgb_ticker.once_ms(BLINK_LED_MS, LedOff, RGB_LED_PIN);
-	}
+	rgb_ticker.once_ms(BLINK_LED_UPD_MS, LedRedOff);
 
 	sprintf_P( buff, PSTR("Updated Frame (%ld Bytes free)"), ESP.getFreeHeap() );
 	Debugln(buff);
@@ -355,18 +304,23 @@ void UpdatedFrame(ValueList * me)
 				oled.setCursor(0, 48);
 				if(!strcmp(me->value,"TH..")){
 					oled.print(F("Toutes"));
+					rgbled.setColor(RGBLed::BLUE);
 				}
 				else if(!strcmp(me->value,"HC..")){
 					oled.print(F("Creuses"));
+					rgbled.setColor(RGBLed::GREEN);
 				}
 				else if(!strcmp(me->value,"HP..")){
 					oled.print(F("Pleines"));
+					rgbled.setColor(RGBLed::RED);
 				}
 				else if(!strcmp(me->value,"HN..")){
 					oled.print(F("Normales"));
+					rgbled.setColor(RGBLed::GREEN);
 				}
 				else if(!strcmp(me->value,"PM..")){
 					oled.print(F("Pointes"));
+					rgbled.setColor(RGBLed::RED);
 				}
 				else{
 					oled.print(me->value);
@@ -414,8 +368,7 @@ void UpdatedFrame(ValueList * me)
 Function: ResetConfig
 Purpose : Set configuration to default values
 ====================================================================== */
-void ResetConfig(void) 
-{
+void ResetConfig(void) {
 	// Start cleaning all that stuff
 	memset(&config, 0, sizeof(_Config));
 
@@ -455,8 +408,7 @@ Purpose : Handle Wifi connection / reconnection and OTA updates
 Input   : setup true if we're called 1st Time from setup
 Output  : state of the wifi status
 ====================================================================== */
-int WifiHandleConn(boolean setup = false) 
-{
+int WifiHandleConn(boolean setup = false) {
 	int ret = WiFi.status();
 
 	if (setup) {
@@ -473,7 +425,8 @@ int WifiHandleConn(boolean setup = false)
 			// Let's see of SDK one is okay
 			if ( WiFi.SSID() == "" ) {
 				InfolnF("Not found may be blank chip!"); 
-			} else {
+			} 
+			else {
 				*config.psk = '\0';
 
 				// Copy SDK SSID
@@ -507,7 +460,8 @@ int WifiHandleConn(boolean setup = false)
 				Infoflush();
 				
 				WiFi.begin(config.ssid, config.psk);
-			} else {
+			} 
+			else {
 				// Open network
 				Infoln(F("unsecure AP"));
 				Infoflush();
@@ -516,12 +470,11 @@ int WifiHandleConn(boolean setup = false)
 
 			timeout = config.ap_retrycount; // 25 * 200 ms = 5 sec time out => 30s
 			// 200 ms loop
-			while ( ((ret = WiFi.status()) != WL_CONNECTED) && timeout )
-			{
+			while ( ((ret = WiFi.status()) != WL_CONNECTED) && timeout ) {
 				// Orange LED
-				LedRGBON(COLOR_ORANGE);
+				rgbled.setColor(RGBLed::YELLOW);
 				delay(50);
-				LedRGBOFF();
+				rgbled.off();
 				delay(150);
 				--timeout;
 			}
@@ -530,8 +483,7 @@ int WifiHandleConn(boolean setup = false)
 		}
 
 		// connected ? disable AP, client mode only
-		if (ret == WL_CONNECTED)
-		{
+		if (ret == WL_CONNECTED) {
 			InfolnF("Connected!");
 			WiFi.mode(WIFI_STA);
 
@@ -550,7 +502,8 @@ int WifiHandleConn(boolean setup = false)
 
 
 		// not connected ? start AP
-		} else {
+		} 
+		else {
 			char ap_ssid[32];
 			InfolnF("Error!");
 			Infoflush();
@@ -575,7 +528,8 @@ int WifiHandleConn(boolean setup = false)
 				InfolnF("'");
 				WiFi.softAP(ap_ssid, config.ap_psk);
 			// Open network
-			} else {
+			} 
+			else {
 				InfolnF("With no password");
 				WiFi.softAP(ap_ssid);
 			}
@@ -597,9 +551,9 @@ int WifiHandleConn(boolean setup = false)
 		// Usefull just after 1st connexion when called from setup() before
 		// launching potentially buggy main()
 		for (uint8_t i=0; i<= 10; i++) {
-			LedRGBON(COLOR_MAGENTA);
+			rgbled.setColor(RGBLed::BLUE);
 			delay(100);
-			LedRGBOFF();
+			rgbled.off();
 			delay(200);
 			ArduinoOTA.handle();
 		}
@@ -630,8 +584,7 @@ void setup()
 	//delay(1000);
 
 	// Init the RGB Led, and set it off
-	rgb_led.Begin();
-	LedRGBOFF();
+	rgbled.off();
 
 	//OLED
 	oled.begin(SSD1306_SWITCHCAPVCC, OLED_I2C_ID);
@@ -646,6 +599,7 @@ void setup()
 	oled.print(F("v"));
 	oled.println(F(ESPTELEINFO_VERSION));
 	oled.display();
+
 
 
 	// Init the serial 1, Our Debug Serial TXD0
@@ -672,11 +626,11 @@ void setup()
 	Debugflush();
 
 	// Check File system init 
-	if (!SPIFFS.begin())
-	{
+	if (!SPIFFS.begin()) {
 		// Serious problem
 		InfolnF("SPIFFS Mount failed");
-	} else {
+	} 
+	else {
 	 
 		InfolnF("SPIFFS Mount succesfull");
 
@@ -692,7 +646,8 @@ void setup()
 	// Read Configuration from EEP
 	if (readConfig()) {
 			DebuglnF("Good CRC, not set!");
-	} else {
+	} 
+	else {
 		// Reset Configuration
 		ResetConfig();
 
@@ -708,35 +663,36 @@ void setup()
 	// We'll drive our onboard LED
 	// old TXD1, not used anymore, has been swapped
 	pinMode(RED_LED_PIN, OUTPUT); 
-	LedRedOFF();
+	LedRedOff();
 
 	// start Wifi connect or soft AP
 	WifiHandleConn(true);
 
 	// OTA callbacks
 	ArduinoOTA.onStart([]() { 
-		LedRGBON(COLOR_MAGENTA);
+		rgbled.setColor(RGBLed::MAGENTA);
 		DebuglnF("Update Started");
 		ota_blink = true;
 	});
 
 	ArduinoOTA.onEnd([]() { 
-		LedRGBOFF();
+		rgbled.off();
 		DebuglnF("Update finished restarting");
 	});
 
 	ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
 		if (ota_blink) {
-			LedRGBON(COLOR_MAGENTA);
-		} else {
-			LedRGBOFF();
+			rgbled.setColor(RGBLed::MAGENTA);
+		} 
+		else {
+			rgbled.off();
 		}
 		ota_blink = !ota_blink;
 		//Serial.printf("Progress: %u%%\n", (progress / (total / 100)));
 	});
 
 	ArduinoOTA.onError([](ota_error_t error) {
-		LedRGBON(COLOR_RED);
+		rgbled.setColor(RGBLed::RED);
 		Infof("Update Error[%u]: ", error); 
 		if (error == OTA_AUTH_ERROR) { InfolnF("Auth Failed"); }
 		else if (error == OTA_BEGIN_ERROR) { InfolnF("Begin Failed"); }
@@ -789,30 +745,29 @@ void setup()
 				Infoflush();
 				fsUploadFile = SPIFFS.open(filename, "w");
 				filename = String();
-			} else if(upload.status == UPLOAD_FILE_WRITE) {
-				if(fsUploadFile) 
-				{
+			} 
+			else if(upload.status == UPLOAD_FILE_WRITE) {
+				if(fsUploadFile) {
 						Info(".");
-						if(fsUploadFile.write(upload.buf, upload.currentSize) != upload.currentSize) 
-						{
+						if(fsUploadFile.write(upload.buf, upload.currentSize) != upload.currentSize) {
 							InfolnF("Written buffer missmatch!");
 							Infoflush();
 						}
 				}
-				else
-				{
+				else{
 							InfolnF("No valid fsUploadFile object!");
 							Infoflush();
 				}
-			} else if(upload.status == UPLOAD_FILE_END) {
-				if(fsUploadFile)
-				{
+			} 
+			else if(upload.status == UPLOAD_FILE_END) {
+				if(fsUploadFile){
 					fsUploadFile.close();
 					InfoF("Uploaded file Size: ");
 					Infoln(upload.totalSize);
 					Infoflush();
 				}
-			} else if(upload.status == UPLOAD_FILE_ABORTED) {
+			} 
+			else if(upload.status == UPLOAD_FILE_ABORTED) {
 				InfolnF("Update was aborted");
 				Infoflush();
 			}
@@ -834,13 +789,14 @@ void setup()
 		[&]() {
 			HTTPUpload& upload = server.upload();
 
-			if(upload.status == UPLOAD_FILE_START) {
+			if(upload.status == UPLOAD_FILE_START) 	{
 				uint32_t maxSketchSpace = (ESP.getFreeSketchSpace() - 0x1000) & 0xFFFFF000;
 				int command; //To handle both SPIFFS and FLASH update
 				WiFiUDP::stopAll();
 				Infof("Update: %s\n", upload.filename.c_str());
 				Infoflush();
-				LedRGBON(COLOR_MAGENTA);
+				rgbled.setColor(RGBLed::MAGENTA);
+
 				ota_blink = true;
 
 				if (upload.filename == "Wifinfo.spiffs.bin") //TODO: to be secured by checking Magic Number... 0xE9 for Flash 0x00 4 times for SPIFFS (No Magic Number)
@@ -849,46 +805,44 @@ void setup()
 					Infoln("Flashing SPIFFS");
 					Infoflush();
 				}
-				else
-				{
+				else{
 					command = U_FLASH;
 					Infoln("Flashing CPP");
 					Infoflush();
 				}
 
 				//start with max available size
-				if(!Update.begin(maxSketchSpace,command)) 
-				{
+				if(!Update.begin(maxSketchSpace,command)) {
 					Update.printError(Serial1);
 					InfoF("Error with maxSketchSpace=");
 					Infoln(maxSketchSpace);
 					Infoflush();
 				}
 
-			} else if(upload.status == UPLOAD_FILE_WRITE) {
+			} 
+			else if(upload.status == UPLOAD_FILE_WRITE) {
 				if (ota_blink) {
-					LedRGBON(COLOR_MAGENTA);
-				} else {
-					LedRGBOFF();
+					rgbled.setColor(RGBLed::MAGENTA);
+				} 
+				else {
+					rgbled.off();
 				}
 				ota_blink = !ota_blink;
 				Info(".");
-				if(Update.write(upload.buf, upload.currentSize) != upload.currentSize) 
-				{
+				if(Update.write(upload.buf, upload.currentSize) != upload.currentSize) {
 					Update.printError(Serial1);
 					InfolnF("Written buffer missmatch!");
 					Infoflush();
 				}
 
-			} else if(upload.status == UPLOAD_FILE_END) {
+			} 
+			else if(upload.status == UPLOAD_FILE_END){
 				//true to set the size to the current progress
-				if(Update.end(true)) 
-				{
+				if(Update.end(true)) {
 					Infof("Update Success: %u\nRebooting...\n", upload.totalSize);
 					Infoflush();
 				}
-				else 
-				{
+				else {
 					Update.printError(Serial1);
 					String s;
 					StringStream ss ( s ) ;
@@ -899,11 +853,12 @@ void setup()
 					Infoflush();
 				}
 
-				LedRGBOFF();
+				rgbled.off();
 
-			} else if(upload.status == UPLOAD_FILE_ABORTED) {
+			} 
+			else if(upload.status == UPLOAD_FILE_ABORTED) {
 				Update.end();
-				LedRGBOFF();
+				rgbled.off();
 				InfolnF("Update was aborted");
 				Infoflush();
 			}
@@ -949,7 +904,7 @@ void setup()
 	//webSocket.onEvent(webSocketEvent);
 
 	// Light off the RGB LED
-	LedRGBOFF();
+	rgbled.off();
 
 	// Update sysinfo every second
 	Every_1_Sec.attach(1, Task_1_Sec);
@@ -967,36 +922,31 @@ void setup()
 		Tick_domoticz.attach(config.domoticz.freq, Task_domoticz);
 }
 
-void floggerflush()
-{
-	if(SPIFFS.begin())
-	{
-	 //check max size & switch file if needed
-	File fr = SPIFFS.open("/log.txt", "r");
-	if(fr)
-	{
-		if (fr.size() >= 10000)
-			{
-				fr.close();
-				if (SPIFFS.exists("/log.1"))
-				{
-					SPIFFS.remove("/log.1");
+// ================================================
+void floggerflush(){
+	if(SPIFFS.begin()){
+		//check max size & switch file if needed
+		File fr = SPIFFS.open("/log.txt", "r");
+		if(fr){
+			if (fr.size() >= 10000){
+					fr.close();
+					if (SPIFFS.exists("/log.1")){
+						SPIFFS.remove("/log.1");
+					}
+					SPIFFS.rename("/log.txt","/log.1");
 				}
-				SPIFFS.rename("/log.txt","/log.1");
-			}
-			else
-			{
-				fr.close();
-			}
-	}
-	 
-	 // open file for writing
-	File f = SPIFFS.open("/log.txt", "a+");
-	if (f) {
-			f.print(floggerbuffer);
-			flogger.begin();
-	}
-	f.close();
+				else{
+					fr.close();
+				}
+		}
+		
+		// open file for writing
+		File f = SPIFFS.open("/log.txt", "a+");
+		if (f) {
+				f.print(floggerbuffer);
+				flogger.begin();
+		}
+		f.close();
 	}
 }
 
@@ -1004,8 +954,7 @@ void floggerflush()
 
 
 /* #### LOOP ################################################################################## */ 
-void loop()
-{
+void loop() {
 	char c;
 
 	// Do all related network stuff
@@ -1018,13 +967,16 @@ void loop()
 	if (task_1_sec) { 
 		UpdateSysinfo(false, false); 
 		task_1_sec = false; 
-	} else if (task_emoncms) { 
+	} 
+	else if (task_emoncms) { 
 		emoncmsPost(); 
 		task_emoncms=false; 
-	} else if (task_jeedom) { 
+	} 
+	else if (task_jeedom) { 
 		jeedomPost();  
 		task_jeedom=false;
-	} else if (task_domoticz) { 
+	} 
+	else if (task_domoticz) { 
 		domoticzPost();  
 		task_domoticz=false;
 	}

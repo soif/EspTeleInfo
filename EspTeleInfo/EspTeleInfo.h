@@ -58,7 +58,7 @@ void floggerflush();
 #define DEBUG_SERIAL	Serial1
 #define DEBUG_SERIAL1	
 
-#define ESPTELEINFO_VERSION "2.0.0a4"
+#define ESPTELEINFO_VERSION "2.0.0a5"
 
 // I prefix debug macro to be sure to use specific for THIS library
 // debugging, this should not interfere with main sketch or other 
@@ -103,25 +103,14 @@ void floggerflush();
 #define OLED_HEIGHT  64
 #define OLED_UNIT_X  80
 
-#define BLINK_LED_MS   50 // 50 ms blink
-#define RGB_LED_PIN    14 
-#define RED_LED_PIN    12
+#define BLINK_LED_NEW_MS   40		// ms blink (when NEW frame received)
+#define BLINK_LED_UPD_MS   200	// ms blink (when UPDated frame received)
+#define RED_LED_PIN    12	//no 14
 
-// value for HSL color
-// see http://www.workwithcolor.com/blue-color-hue-range-01.htm
-#define COLOR_RED             0
-#define COLOR_ORANGE         30
-#define COLOR_ORANGE_YELLOW  45
-#define COLOR_YELLOW         60
-#define COLOR_YELLOW_GREEN   90
-#define COLOR_GREEN         120
-#define COLOR_GREEN_CYAN    165
-#define COLOR_CYAN          180
-#define COLOR_CYAN_BLUE     210
-#define COLOR_BLUE          240
-#define COLOR_BLUE_MAGENTA  275
-#define COLOR_MAGENTA	      300
-#define COLOR_PINK		      350
+#define RGB_LED_PIN_R	2	//D4
+#define RGB_LED_PIN_G	0 //D3
+#define RGB_LED_PIN_B	14 // 16 D0 --> 14 D5
+
 
 // GPIO 1 TX on board blue led
 #ifdef BLU_LED_PIN
@@ -131,15 +120,7 @@ void floggerflush();
 #define LedBluON()  {}
 #define LedBluOFF() {}
 #endif
-// GPIO 12 red led
-#define LedRedON()  {digitalWrite(RED_LED_PIN, 1);}
-#define LedRedOFF() {digitalWrite(RED_LED_PIN, 0);}
 
-// Light off the RGB LED
-#ifndef RGB_LED_PIN
-#define LedRGBOFF() {}
-#define LedRGBON(x) {}
-#endif
 // sysinfo informations
 typedef struct 
 {
