@@ -49,6 +49,7 @@ extern "C" {
 #include "config.h"
 #include "PString.h"
 
+
 //External function from main CPP
 void floggerflush();
 
@@ -57,7 +58,7 @@ void floggerflush();
 #define DEBUG_SERIAL	Serial1
 #define DEBUG_SERIAL1	
 
-#define ESPTELEINFO_VERSION "2.0.0a6"
+#define ESPTELEINFO_VERSION "2.1.0a1"
 
 // I prefix debug macro to be sure to use specific for THIS library
 // debugging, this should not interfere with main sketch or other 
@@ -138,6 +139,8 @@ void ResetConfig(void);
 void Task_emoncms();
 void Task_jeedom();
 void Task_domoticz();
-
+void Task_domoticz();
+void LedRgbColor(int rgb[3]);
+void LedRgbColorCurrent();
 #endif
 

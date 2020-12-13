@@ -25,6 +25,7 @@
 
 #include "webclient.h"
 #include <Base64.h>
+#include <RGBLed.h>
 
 
 #include <map>
@@ -62,6 +63,9 @@ boolean httpPostBasicAuth(char * host, uint16_t port, char * url, char * basicau
 	Debugf("http%s://%s:%d%s => ", port==443?"s":"", host, port, url);
 
 	// start connection and send HTTP header
+	if ( config.config & CFG_RGB_LED) {
+			LedRgbColor(RGBLed::CYAN);
+	}
 	int httpCode = http.GET();
 	if(httpCode) {
 			// HTTP header has been send and Server response header has been handled
@@ -77,6 +81,10 @@ boolean httpPostBasicAuth(char * host, uint16_t port, char * url, char * basicau
 			DebugF("failed!");
 	}
 	Debugf(" in %d ms\r\n",millis()-start);
+	if ( config.config & CFG_RGB_LED) {
+		delay(20);
+		LedRgbColorCurrent();
+	}
 	return ret;
 }
 

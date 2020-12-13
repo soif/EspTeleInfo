@@ -76,6 +76,7 @@ bool oled_inited =false;
 
 //RGB LED
 RGBLed rgbled(RGB_LED_PIN_R, RGB_LED_PIN_G, RGB_LED_PIN_B, RGBLed::COMMON_CATHODE);
+int current_color[3]={0, 0, 0};
 
 // define whole brigtness level for RGBLED (50%)
 uint8_t rgb_brightness = 50;
@@ -166,6 +167,26 @@ void LedRedOff(){
 	digitalWrite(RED_LED_PIN, 0);
 }
 
+
+/* ======================================================================
+Function: LedRgbColor 
+Input   : Color
+====================================================================== */
+void LedRgbColor(int rgb[3]){
+	current_color[0]=rgb[0];
+	current_color[1]=rgb[1];
+	current_color[2]=rgb[2];
+	rgbled.setColor(rgb);
+}
+
+/* ======================================================================
+Function: LedRgbColor 
+Purpose   : Revert Previous Color
+====================================================================== */
+void LedRgbColorCurrent(){
+	rgbled.setColor(current_color);
+}
+
 /* ======================================================================
 Function: ADPSCallback 
 Purpose : called by library when we detected a ADPS on any phased
@@ -237,11 +258,6 @@ Input   : linked list pointer on the concerned data
 void NewFrame(ValueList * me) {
 	char buff[32];
 	
-	//to implements
-	if ( config.config & CFG_RGB_LED) {
-
-	}
-
 	// Light the RED LED 
 	LedRedOn();
 		
@@ -305,23 +321,23 @@ void UpdatedFrame(ValueList * me) {
 					oled.setCursor(0, 48);
 					if(!strcmp(me->value,"TH..")){
 						oled.print(F("Toutes"));
-						rgbled.setColor(RGBLed::BLUE);
+						LedRgbColor(RGBLed::BLUE);
 					}
 					else if(!strcmp(me->value,"HC..")){
 						oled.print(F("Creuses"));
-						rgbled.setColor(RGBLed::GREEN);
+						LedRgbColor(RGBLed::GREEN);
 					}
 					else if(!strcmp(me->value,"HP..")){
 						oled.print(F("Pleines"));
-						rgbled.setColor(RGBLed::RED);
+						LedRgbColor(RGBLed::RED);
 					}
 					else if(!strcmp(me->value,"HN..")){
 						oled.print(F("Normales"));
-						rgbled.setColor(RGBLed::GREEN);
+						LedRgbColor(RGBLed::GREEN);
 					}
 					else if(!strcmp(me->value,"PM..")){
 						oled.print(F("Pointes"));
-						rgbled.setColor(RGBLed::RED);
+						LedRgbColor(RGBLed::RED);
 					}
 					else{
 						oled.print(me->value);
@@ -473,7 +489,7 @@ int WifiHandleConn(boolean setup = false) {
 			// 200 ms loop
 			while ( ((ret = WiFi.status()) != WL_CONNECTED) && timeout ) {
 				// Orange LED
-				rgbled.setColor(RGBLed::YELLOW);
+				LedRgbColor(RGBLed::YELLOW);
 				delay(50);
 				rgbled.off();
 				delay(150);
@@ -551,7 +567,7 @@ int WifiHandleConn(boolean setup = false) {
 		// Usefull just after 1st connexion when called from setup() before
 		// launching potentially buggy main()
 		for (uint8_t i=0; i<= 10; i++) {
-			rgbled.setColor(RGBLed::BLUE);
+			LedRgbColor(RGBLed::BLUE);
 			delay(100);
 			rgbled.off();
 			delay(200);
@@ -671,20 +687,20 @@ void setup()
 
 	// OTA callbacks
 	ArduinoOTA.onStart([]() { 
-		rgbled.setColor(RGBLed::MAGENTA);
+		LedRgbColor(RGBLed::MAGENTA);
 		DebuglnF("Update Started");
 		ota_blink = true;
 	});
 
 	ArduinoOTA.onEnd([]() { 
-		rgbled.setColor(RGBLed::BLUE);
+		LedRgbColor(RGBLed::BLUE);
 		delay(500);
 		DebuglnF("Update finished restarting");
 	});
 
 	ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
 		if (ota_blink) {
-			rgbled.setColor(RGBLed::MAGENTA);
+			LedRgbColor(RGBLed::MAGENTA);
 		} 
 		else {
 			rgbled.off();
@@ -695,7 +711,7 @@ void setup()
 
 	ArduinoOTA.onError([](ota_error_t error) {
 		Infof("Update Error[%u]: ", error); 
-		rgbled.setColor(RGBLed::RED);
+		LedRgbColor(RGBLed::RED);
 		if (error == OTA_AUTH_ERROR) { InfolnF("Auth Failed"); }
 		else if (error == OTA_BEGIN_ERROR) { InfolnF("Begin Failed"); }
 		else if (error == OTA_CONNECT_ERROR) { InfolnF("Connect Failed"); }
@@ -797,7 +813,7 @@ void setup()
 				WiFiUDP::stopAll();
 				Infof("Update: %s\n", upload.filename.c_str());
 				Infoflush();
-				rgbled.setColor(RGBLed::MAGENTA);
+				LedRgbColor(RGBLed::MAGENTA);
 
 				ota_blink = true;
 
@@ -824,7 +840,7 @@ void setup()
 			} 
 			else if(upload.status == UPLOAD_FILE_WRITE) {
 				if (ota_blink) {
-					rgbled.setColor(RGBLed::MAGENTA);
+					LedRgbColor(RGBLed::MAGENTA);
 				} 
 				else {
 					rgbled.off();
