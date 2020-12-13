@@ -45,8 +45,6 @@ uint16_t crc16Update(uint16_t crc, uint8_t a)
 Function: eeprom_dump
 Purpose : dump eeprom value to serial 
 Input 	: -
-Output	: -
-Comments: -
 ====================================================================== */
 void eepromDump(uint8_t bytesPerRow) 
 {
@@ -86,7 +84,6 @@ Function: readConfig
 Purpose : fill config structure with data located into eeprom
 Input 	: true if we need to clear actual struc in case of error
 Output	: true if config found and crc ok, false otherwise
-Comments: -
 ====================================================================== */
 bool readConfig (bool clear_on_error) 
 {
@@ -176,9 +173,6 @@ bool saveConfig (void)
 /* ======================================================================
 Function: showConfig
 Purpose : display configuration
-Input 	: -
-Output	: -
-Comments: -
 ====================================================================== */
 void showConfig() 
 {

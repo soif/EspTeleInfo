@@ -105,8 +105,6 @@ Function: UpdateSysinfo
 Purpose : update sysinfo variables
 Input   : true if first call
 					true if needed to print on serial debug
-Output  : - 
-Comments: -
 ====================================================================== */
 void UpdateSysinfo(boolean first_call, boolean show_debug)
 {
@@ -123,9 +121,6 @@ void UpdateSysinfo(boolean first_call, boolean show_debug)
 /* ======================================================================
 Function: Task_1_Sec 
 Purpose : update our second ticker
-Input   : -
-Output  : - 
-Comments: -
 ====================================================================== */
 void Task_1_Sec()
 {
@@ -136,8 +131,6 @@ void Task_1_Sec()
 /* ======================================================================
 Function: Task_emoncms
 Purpose : callback of emoncms ticker
-Input   : 
-Output  : -
 Comments: Like an Interrupt, need to be short, we set flag for main loop
 ====================================================================== */
 void Task_emoncms()
@@ -148,8 +141,6 @@ void Task_emoncms()
 /* ======================================================================
 Function: Task_jeedom
 Purpose : callback of jeedom ticker
-Input   : 
-Output  : -
 Comments: Like an Interrupt, need to be short, we set flag for main loop
 ====================================================================== */
 void Task_jeedom()
@@ -160,8 +151,6 @@ void Task_jeedom()
 /* ======================================================================
 Function: Task_domoticz
 Purpose : callback of domoticz ticker
-Input   : 
-Output  : -
 Comments: Like an Interrupt, need to be short, we set flag for main loop
 ====================================================================== */
 void Task_domoticz()
@@ -173,8 +162,6 @@ void Task_domoticz()
 Function: LedOff 
 Purpose : callback called after led blink delay
 Input   : led (defined in term of PIN)
-Output  : - 
-Comments: -
 ====================================================================== */
 void LedOff(int led)
 {
@@ -197,8 +184,6 @@ Purpose : Light RGB Led with HSB value
 Input   : Hue (0..255)
 					Saturation (0..255)
 					Brightness (0..255)
-Output  : - 
-Comments: 
 ====================================================================== */
 void LedRGBON (uint16_t hue)
 {
@@ -217,9 +202,6 @@ void LedRGBON (uint16_t hue)
 /* ======================================================================
 Function: LedRGBOFF 
 Purpose : light off the RGN LED
-Input   : -
-Output  : - 
-Comments: -
 ====================================================================== */
 //void LedOff(int led)
 void LedRGBOFF(void)
@@ -241,7 +223,6 @@ Input   : phase number
 						1 for ADIR1 triphase
 						2 for ADIR2 triphase
 						3 for ADIR3 triphase
-Output  : - 
 Comments: should have been initialised in the main sketch with a
 					tinfo.attachADPSCallback(ADPSCallback())
 ====================================================================== */
@@ -261,8 +242,6 @@ Function: DataCallback
 Purpose : callback when we detected new or modified data received
 Input   : linked list pointer on the concerned data
 					value current state being TINFO_VALUE_ADDED/TINFO_VALUE_UPDATED
-Output  : - 
-Comments: -
 ====================================================================== */
 void DataCallback(ValueList * me, uint8_t flags)
 {
@@ -304,8 +283,6 @@ void DataCallback(ValueList * me, uint8_t flags)
 Function: NewFrame 
 Purpose : callback when we received a complete teleinfo frame
 Input   : linked list pointer on the concerned data
-Output  : - 
-Comments: -
 ====================================================================== */
 void NewFrame(ValueList * me) 
 {
@@ -327,7 +304,6 @@ void NewFrame(ValueList * me)
 Function: NewFrame 
 Purpose : callback when we received a complete teleinfo frame
 Input   : linked list pointer on the concerned data
-Output  : - 
 Comments: it's called only if one data in the frame is different than
 					the previous frame
 ====================================================================== */
@@ -437,9 +413,6 @@ void UpdatedFrame(ValueList * me)
 /* ======================================================================
 Function: ResetConfig
 Purpose : Set configuration to default values
-Input   : -
-Output  : -
-Comments: -
 ====================================================================== */
 void ResetConfig(void) 
 {
@@ -481,7 +454,6 @@ Function: WifiHandleConn
 Purpose : Handle Wifi connection / reconnection and OTA updates
 Input   : setup true if we're called 1st Time from setup
 Output  : state of the wifi status
-Comments: -
 ====================================================================== */
 int WifiHandleConn(boolean setup = false) 
 {
@@ -637,13 +609,11 @@ int WifiHandleConn(boolean setup = false)
 	return WiFi.status();
 }
 
-/* ======================================================================
-Function: setup
-Purpose : Setup I/O and other one time startup stuff
-Input   : -
-Output  : - 
-Comments: -
-====================================================================== */
+
+
+
+
+/* ## SETUP ######################################################################## */
 void setup()
 {
 	//char buff[32];    // Unused Variable
@@ -1030,13 +1000,10 @@ void floggerflush()
 	}
 }
 
-/* ======================================================================
-Function: loop
-Purpose : infinite loop main code
-Input   : -
-Output  : - 
-Comments: -
-====================================================================== */
+
+
+
+/* #### LOOP ################################################################################## */ 
 void loop()
 {
 	char c;
