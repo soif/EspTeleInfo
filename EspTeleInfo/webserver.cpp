@@ -447,7 +447,9 @@ void tinfoJSONTable(void)
       response += F("\", \"fl\":");
       response += me->flags ;
 
-      //add description, https://www.enedis.fr/sites/default/files/Enedis-NOI-CPT_54E.pdf
+      //add description,
+      // https://www.enedis.fr/sites/default/files/Enedis-NOI-CPT_54E.pdf
+      // https://www.enedis.fr/sites/default/files/Enedis-NOI-CPT_02E.pdf
       response += F(", \"de\":\"") ;
       if(!strcmp(me->name, "ADCO")){
         response += F("Adresse du compteur");
