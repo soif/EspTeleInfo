@@ -677,7 +677,8 @@ void setup()
 	});
 
 	ArduinoOTA.onEnd([]() { 
-		rgbled.off();
+		rgbled.setColor(RGBLed::BLUE);
+		delay(500);
 		DebuglnF("Update finished restarting");
 	});
 
@@ -693,8 +694,8 @@ void setup()
 	});
 
 	ArduinoOTA.onError([](ota_error_t error) {
-		rgbled.setColor(RGBLed::RED);
 		Infof("Update Error[%u]: ", error); 
+		rgbled.setColor(RGBLed::RED);
 		if (error == OTA_AUTH_ERROR) { InfolnF("Auth Failed"); }
 		else if (error == OTA_BEGIN_ERROR) { InfolnF("Begin Failed"); }
 		else if (error == OTA_CONNECT_ERROR) { InfolnF("Connect Failed"); }
