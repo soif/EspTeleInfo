@@ -37,7 +37,6 @@
 #include <Ticker.h>
 //#include <WebSocketsServer.h>
 //#include <Hash.h>
-#include <NeoPixelBus.h>
 #include <LibTeleinfo.h>
 #include <FS.h>
 
