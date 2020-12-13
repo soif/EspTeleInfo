@@ -23,6 +23,10 @@
 // All text above must be included in any redistribution.
 //
 // **********************************************************************************
+// Forked into EspTeleInfo by François Déchery
+// https://github.com/soif/
+// **********************************************************************************
+
 // Include Arduino header
 #include <Arduino.h>
 #include <ESP8266WiFi.h>

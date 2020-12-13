@@ -19,6 +19,10 @@
 // All text above must be included in any redistribution.
 //
 // **********************************************************************************
+// Forked into EspTeleInfo by François Déchery
+// https://github.com/soif/
+// **********************************************************************************
+
 #include "./config.h" 
 
 // Configuration structure for whole program
