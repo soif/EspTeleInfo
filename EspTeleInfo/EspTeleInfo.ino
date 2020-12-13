@@ -272,64 +272,65 @@ void UpdatedFrame(ValueList * me) {
 	Debugln(buff);
 
 // dispplay to OLED
-	if (me) {
-		if(! oled_inited){
-			oled.clearDisplay();
-			oled.setTextSize(2);
-			oled.drawFastHLine(0,18,OLED_WIDTH,WHITE);
-			oled.drawFastHLine(0,42,OLED_WIDTH,WHITE);
-			oled.setCursor(OLED_UNIT_X, 0);
-			oled.print("Watt");
-			oled.setCursor(OLED_UNIT_X, 23);
-			oled.print("Amp");
-			oled_inited= true;
+	if ( config.config & CFG_LCD) {
+		if (me) {
+			if(! oled_inited){
+				oled.clearDisplay();
+				oled.setTextSize(2);
+				oled.drawFastHLine(0,18,OLED_WIDTH,WHITE);
+				oled.drawFastHLine(0,42,OLED_WIDTH,WHITE);
+				oled.setCursor(OLED_UNIT_X, 0);
+				oled.print("Watt");
+				oled.setCursor(OLED_UNIT_X, 23);
+				oled.print("Amp");
+				oled_inited= true;
+			}
+			char pad[7];
+			unsigned int ival;
+			while (me->next) {
+				me = me->next;
+				if(!strcmp(me->name,"PAPP")){
+					oled.setCursor(0, 0);
+					ival=atoi(me->value);
+					snprintf(pad,sizeof(pad), "%6u", ival);
+					oled.print(pad);
+				}
+				else if(!strcmp(me->name,"IINST")){
+					oled.setCursor(0, 23);
+					ival=atoi(me->value);
+					snprintf(pad,sizeof(pad), "%6u", ival);
+					oled.print(pad);
+				}
+				else if(!strcmp(me->name,"OPTARIF")){
+					oled.setCursor(0, 48);
+					if(!strcmp(me->value,"TH..")){
+						oled.print(F("Toutes"));
+						rgbled.setColor(RGBLed::BLUE);
+					}
+					else if(!strcmp(me->value,"HC..")){
+						oled.print(F("Creuses"));
+						rgbled.setColor(RGBLed::GREEN);
+					}
+					else if(!strcmp(me->value,"HP..")){
+						oled.print(F("Pleines"));
+						rgbled.setColor(RGBLed::RED);
+					}
+					else if(!strcmp(me->value,"HN..")){
+						oled.print(F("Normales"));
+						rgbled.setColor(RGBLed::GREEN);
+					}
+					else if(!strcmp(me->value,"PM..")){
+						oled.print(F("Pointes"));
+						rgbled.setColor(RGBLed::RED);
+					}
+					else{
+						oled.print(me->value);
+					}
+				}
+			}
+			oled.display();
 		}
-		char pad[7];
-		unsigned int ival;
-		while (me->next) {
-			me = me->next;
-			if(!strcmp(me->name,"PAPP")){
-				oled.setCursor(0, 0);
-				ival=atoi(me->value);
-				snprintf(pad,sizeof(pad), "%6u", ival);
-				oled.print(pad);
-			}
-			else if(!strcmp(me->name,"IINST")){
-				oled.setCursor(0, 23);
-				ival=atoi(me->value);
-				snprintf(pad,sizeof(pad), "%6u", ival);
-				oled.print(pad);
-			}
-			else if(!strcmp(me->name,"OPTARIF")){
-				oled.setCursor(0, 48);
-				if(!strcmp(me->value,"TH..")){
-					oled.print(F("Toutes"));
-					rgbled.setColor(RGBLed::BLUE);
-				}
-				else if(!strcmp(me->value,"HC..")){
-					oled.print(F("Creuses"));
-					rgbled.setColor(RGBLed::GREEN);
-				}
-				else if(!strcmp(me->value,"HP..")){
-					oled.print(F("Pleines"));
-					rgbled.setColor(RGBLed::RED);
-				}
-				else if(!strcmp(me->value,"HN..")){
-					oled.print(F("Normales"));
-					rgbled.setColor(RGBLed::GREEN);
-				}
-				else if(!strcmp(me->value,"PM..")){
-					oled.print(F("Pointes"));
-					rgbled.setColor(RGBLed::RED);
-				}
-				else{
-					oled.print(me->value);
-				}
-			}
-		}
-		oled.display();
 	}
-
 /*
 	// Got at least one ?
 	if (me) {
@@ -490,15 +491,14 @@ int WifiHandleConn(boolean setup = false) {
 			InfoF("IP address   : "); Infoln(WiFi.localIP());
 			InfoF("MAC address  : "); Infoln(WiFi.macAddress());
 			Infoflush();
-			
+
 			oled.clearDisplay();
 			oled.setTextSize(1);
 			oled.setCursor(0, 0);
 			oled.println(WiFi.localIP());
-			oled.setCursor(0, 12);
+			oled.setCursor(0, 20);
 			oled.println(WiFi.macAddress());
 			oled.display();
-
 
 
 		// not connected ? start AP
@@ -587,6 +587,7 @@ void setup()
 	rgbled.off();
 
 	//OLED
+
 	oled.begin(SSD1306_SWITCHCAPVCC, OLED_I2C_ID);
 	oled.clearDisplay();
 	oled.setTextSize(2);
