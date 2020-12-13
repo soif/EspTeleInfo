@@ -94,7 +94,13 @@ void floggerflush();
 #define Infoflush()  {}
 #endif
 
+// Pins #########################################
+#define RED_LED_PIN		12	//D8
+#define RGB_LED_PIN_R	2		//D4
+#define RGB_LED_PIN_G	0		//D3
+#define RGB_LED_PIN_B	14	//D5
 
+// Settings #####################################
 //#define OLED_PIN_SDA  4
 //#define OLED_PIN_SCL  5
 #define OLED_I2C_ID 0x3C
@@ -102,25 +108,12 @@ void floggerflush();
 #define OLED_HEIGHT  64
 #define OLED_UNIT_X  80
 
-#define BLINK_LED_NEW_MS   40		// ms blink (when NEW frame received)
-#define BLINK_LED_UPD_MS   200	// ms blink (when UPDated frame received)
-#define RED_LED_PIN    12	//no 14
+#define BLINK_LED_NEW_MS	40		// ms blink (when NEW frame received)
+#define BLINK_LED_UPD_MS	200	// ms blink (when UPDated frame received)
 
-#define RGB_LED_PIN_R	2	//D4
-#define RGB_LED_PIN_G	0 //D3
-#define RGB_LED_PIN_B	14 // 16 D0 --> 14 D5
-
-
-// GPIO 1 TX on board blue led
-#ifdef BLU_LED_PIN
-#define LedBluON()  {digitalWrite(BLU_LED_PIN, 0);}
-#define LedBluOFF() {digitalWrite(BLU_LED_PIN, 1);}
-#else
-#define LedBluON()  {}
-#define LedBluOFF() {}
-#endif
 
 // sysinfo informations
+// ===================================================
 typedef struct 
 {
 	String sys_uptime;
