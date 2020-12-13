@@ -64,6 +64,7 @@ ESP8266WebServer server(80);
 File fsUploadFile;
 
 bool ota_blink;
+bool ota_blink2;
 
 // Teleinfo
 TInfo tinfo;
@@ -565,6 +566,10 @@ int WifiHandleConn(boolean setup = false) {
 		// the need to connect FTDI to reflash
 		// Usefull just after 1st connexion when called from setup() before
 		// launching potentially buggy main()
+		oled.setCursor(0, 44);
+		oled.print(F("Waiting for OTA..."));
+		oled.display();
+
 		for (uint8_t i=0; i<= 10; i++) {
 			LedRgbColor(RGBLed::BLUE);
 			delay(100);
@@ -572,6 +577,11 @@ int WifiHandleConn(boolean setup = false) {
 			delay(200);
 			ArduinoOTA.handle();
 		}
+		oled.clearDisplay();
+		oled.setTextSize(2);
+		oled.setCursor(0, 0);
+		oled.print(F("Start..."));
+		oled.display();
 
 	} // if setup
 
@@ -611,7 +621,7 @@ void setup()
 	oled.println(F("Esp"));
 	oled.setCursor(8, 17);
 	oled.println(F("TeleInfo"));
-	oled.setCursor(0, 44);
+	oled.setCursor(8, 44);
 	oled.print(F("v"));
 	oled.println(F(ESPTELEINFO_VERSION));
 	oled.display();
@@ -688,11 +698,25 @@ void setup()
 	ArduinoOTA.onStart([]() { 
 		LedRgbColor(RGBLed::MAGENTA);
 		DebuglnF("Update Started");
+		
+		oled.clearDisplay();
+		oled.setTextSize(2);
+		oled.setCursor(0, 0);
+		oled.println(F("OTA Start"));
+		oled.setTextSize(1);
+		oled.display();
 		ota_blink = true;
 	});
 
 	ArduinoOTA.onEnd([]() { 
 		LedRgbColor(RGBLed::BLUE);
+		oled.clearDisplay();
+		oled.setCursor(0, 0);
+		oled.setTextSize(2);
+		oled.println(F("OTA End"));
+		oled.println();
+		oled.println(F("Reboot..."));
+		oled.display();
 		delay(500);
 		DebuglnF("Update finished restarting");
 	});
@@ -700,6 +724,11 @@ void setup()
 	ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
 		if (ota_blink) {
 			LedRgbColor(RGBLed::MAGENTA);
+			ota_blink2 = !ota_blink2;
+			if(ota_blink2){
+				oled.print(F("."));
+				oled.display();
+			}
 		} 
 		else {
 			rgbled.off();
@@ -711,6 +740,11 @@ void setup()
 	ArduinoOTA.onError([](ota_error_t error) {
 		Infof("Update Error[%u]: ", error); 
 		LedRgbColor(RGBLed::RED);
+		oled.clearDisplay();
+		oled.setCursor(0, 0);
+		oled.println(F("OTA ERROR"));
+		oled.display();
+
 		if (error == OTA_AUTH_ERROR) { InfolnF("Auth Failed"); }
 		else if (error == OTA_BEGIN_ERROR) { InfolnF("Begin Failed"); }
 		else if (error == OTA_CONNECT_ERROR) { InfolnF("Connect Failed"); }
