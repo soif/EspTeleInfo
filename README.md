@@ -1,5 +1,8 @@
 # EspTeleinfo
 
+**(WORK IN PROGRESS!)**
+
+
 This is a fork of the amazing Wifinfo , part of LibTeleInfo by Charles Hallard. This ESP8266 project connects to french Enedis Energy counter, using the TeleInfo port, and publish the results to:
 
 - Its own webserver
@@ -12,12 +15,25 @@ You can see Teleinformation official french datasheet [there][1]
 
 ## Description
 
+Cette réalisation est basée sur l'excellent  projet [Wifinfo][2] de [Charles Hallard][3], ainsi que [le fork de Sylvain Remy][4] (qui a rajouté le support de Domoticz).
 
-Cette réalisation est basée sur l'excellent  projet [Wifinfo][2] de [Charles Hallard][3].
 
-## WORK IN PROGESS
+## Fonctionnalités
 
-to be completed
+- Serveur Web fournissant le suivi en temps réel
+- Envoi de la TeleInfo vers Domoticz, Jeedom ou Emoncms
+- Affichage sur Afficheur OLED de la conso instantanée, et de la période tarifaire
+- Led RGB affichant la période tarifaire en court (Heures Pleine/ Heures Creuses)
+- Led affichant les trames recues
+
+## Schema
+
+![schematic](doc/img/schema.png)
+
+## PCB (Prototype)
+
+![proto](doc/img/pcb.png)
+
 
 ## License
 
@@ -28,3 +44,4 @@ Si vous êtes une entreprise et que vous souhaitez participer car vous utilisez 
 [1]: https://www.enedis.fr/sites/default/files/Enedis-NOI-CPT_02E.pdf
 [2]: https://hallard.me/wifiinfo/
 [3]: https://hallard.me
+[4]: https://github.com/sremy91/LibTeleinfo
