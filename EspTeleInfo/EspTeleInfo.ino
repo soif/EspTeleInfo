@@ -39,6 +39,11 @@
 #include <LibTeleinfo.h>
 #include <FS.h>
 
+#include <SPI.h>
+#include <Wire.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
+
 // Global project file
 #include "EspTeleInfo.h"
 #include "StringStream.h"
@@ -46,6 +51,7 @@
 
 char floggerbuffer[255];
 PString flogger(floggerbuffer, sizeof(floggerbuffer));
+
 
 //WiFiManager wifi(0);
 ESP8266WebServer server(80);
@@ -64,6 +70,10 @@ TInfo tinfo;
 //NeoPixelBus<NeoGrbFeature, NeoEsp8266BitBang800KbpsMethod> rgb_led(1, RGB_LED_PIN);
 NeoPixelBus<NeoRgbFeature, NeoEsp8266BitBang800KbpsMethod> rgb_led(1, RGB_LED_PIN);
 #endif
+
+//OLED
+Adafruit_SSD1306 oled(OLED_WIDTH, OLED_HEIGHT, &Wire, -1);
+bool oled_inited =false;
 
 
 // define whole brigtness level for RGBLED (50%)
@@ -332,6 +342,60 @@ void UpdatedFrame(ValueList * me)
   sprintf_P( buff, PSTR("Updated Frame (%ld Bytes free)"), ESP.getFreeHeap() );
   Debugln(buff);
 
+// dispplay to OLED
+  if (me) {
+    if(! oled_inited){
+      oled.clearDisplay();
+      oled.setTextSize(2);
+      oled.drawFastHLine(0,18,OLED_WIDTH,WHITE);
+      oled.drawFastHLine(0,42,OLED_WIDTH,WHITE);
+      oled.setCursor(OLED_UNIT_X, 0);
+      oled.print("Watt");
+      oled.setCursor(OLED_UNIT_X, 23);
+      oled.print("Amp");
+      oled_inited= true;
+    }
+    char pad[7];
+    unsigned int ival;
+    while (me->next) {
+      me = me->next;
+      if(!strcmp(me->name,"PAPP")){
+        oled.setCursor(0, 0);
+        ival=atoi(me->value);
+        snprintf(pad,sizeof(pad), "%6u", ival);
+        oled.print(pad);
+      }
+      else if(!strcmp(me->name,"IINST")){
+        oled.setCursor(0, 23);
+        ival=atoi(me->value);
+        snprintf(pad,sizeof(pad), "%6u", ival);
+        oled.print(pad);
+      }
+      else if(!strcmp(me->name,"OPTARIF")){
+        oled.setCursor(0, 48);
+        if(!strcmp(me->value,"TH..")){
+          oled.print(F("Toutes"));
+        }
+        else if(!strcmp(me->value,"HC..")){
+          oled.print(F("Creuses"));
+        }
+        else if(!strcmp(me->value,"HP..")){
+          oled.print(F("Pleines"));
+        }
+        else if(!strcmp(me->value,"HN..")){
+          oled.print(F("Normales"));
+        }
+        else if(!strcmp(me->value,"PM..")){
+          oled.print(F("Pointes"));
+        }
+        else{
+          oled.print(me->value);
+        }
+      }
+    }
+    oled.display();
+  }
+
 /*
   // Got at least one ?
   if (me) {
@@ -498,7 +562,17 @@ int WifiHandleConn(boolean setup = false)
       InfoF("IP address   : "); Infoln(WiFi.localIP());
       InfoF("MAC address  : "); Infoln(WiFi.macAddress());
       Infoflush();
-    
+      
+      oled.clearDisplay();
+      oled.setTextSize(1);
+      oled.setCursor(0, 0);
+      oled.println(WiFi.localIP());
+      oled.setCursor(0, 12);
+      oled.println(WiFi.macAddress());
+      oled.display();
+
+
+
     // not connected ? start AP
     } else {
       char ap_ssid[32];
@@ -584,6 +658,21 @@ void setup()
   // Init the RGB Led, and set it off
   rgb_led.Begin();
   LedRGBOFF();
+
+  //OLED
+  oled.begin(SSD1306_SWITCHCAPVCC, OLED_I2C_ID);
+  oled.clearDisplay();
+  oled.setTextSize(2);
+  oled.setTextColor(WHITE, BLACK);
+  oled.setCursor(42, 0);
+  oled.println(F("Esp"));
+  oled.setCursor(8, 17);
+  oled.println(F("TeleInfo"));
+  oled.setCursor(0, 44);
+  oled.print(F("v"));
+  oled.println(F(ESPTELEINFO_VERSION));
+  oled.display();
+
 
   // Init the serial 1, Our Debug Serial TXD0
   // note this serial can only transmit, just 

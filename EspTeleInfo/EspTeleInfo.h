@@ -91,6 +91,14 @@ void floggerflush();
 #define Infoflush()  {}
 #endif
 
+
+//#define OLED_PIN_SDA  4
+//#define OLED_PIN_SCL  5
+#define OLED_I2C_ID 0x3C
+#define OLED_WIDTH  128
+#define OLED_HEIGHT  64
+#define OLED_UNIT_X  80
+
 #define BLINK_LED_MS   50 // 50 ms blink
 #define RGB_LED_PIN    14 
 #define RED_LED_PIN    12
