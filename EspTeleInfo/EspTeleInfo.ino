@@ -1,5 +1,5 @@
 // **********************************************************************************
-// ESP8266 Teleinfo WEB Server
+// EspTeleinfo WEB Server
 // **********************************************************************************
 // Creative Commons Attrib Share-Alike License
 // You are free to use/extend this library but please abide with the CC-BY-SA license:
@@ -15,16 +15,15 @@
 // This program has been downloaded from https://github.com/hallard/LibTeleinfo/tree/master/examples/Wifinfo
 //
 // Written by Charles-Henri Hallard (http://hallard.me)
-// Updated by Sylvain REMY (https://github.com/sremy91)
+// Updated by Sylvain REMY 					(https://github.com/sremy91)
+// Updated by Fraçois Déchery 			(https://github.com/soif)
 //
-// History : V1.00 2015-06-14 - Charles-Henri HALLARD - First release
-// History : V2.00 2017-08-27 - Sylvain REMY          - Domoticz management, some improvements & bug fixes
+// History : V1.00 2015-06-14 - Charles-Henri HALLARD	- First release
+// History : V2.00 2017-08-27 - Sylvain REMY					- Domoticz management, some improvements & bug fixes
+// History : V2.1  2020-12-13 - Fraçois Déchery				- Show Descriptions, Display HP/HC on the new RGB led, Frames Activity on Red Led, OLED support, Shematic and PCB...
 //
 // All text above must be included in any redistribution.
 //
-// **********************************************************************************
-// Forked into EspTeleInfo by François Déchery
-// https://github.com/soif/
 // **********************************************************************************
 
 // Include Arduino header

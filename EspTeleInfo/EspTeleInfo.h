@@ -49,16 +49,34 @@ extern "C" {
 #include "config.h"
 #include "PString.h"
 
+// Version #################################################################
+#define ESPTELEINFO_VERSION "2.1.0a2"
 
-//External function from main CPP
-void floggerflush();
 
+// Pins ###########################################################
+#define RED_LED_PIN		12	//D8
+#define RGB_LED_PIN_R	2		//D4
+#define RGB_LED_PIN_G	0		//D3
+#define RGB_LED_PIN_B	14	//D5
+
+// Settings #######################################################
+//#define OLED_PIN_SDA  4
+//#define OLED_PIN_SCL  5
+#define OLED_I2C_ID 0x3C
+#define OLED_WIDTH  128
+#define OLED_HEIGHT  64
+#define OLED_UNIT_X  80
+
+#define BLINK_LED_NEW_MS	40		// ms blink (when NEW frame received)
+#define BLINK_LED_UPD_MS	200	// ms blink (when UPDated frame received)
+
+
+// Debug ###########################################################
 #define DEBUG
 #define INFO
 #define DEBUG_SERIAL	Serial1
 #define DEBUG_SERIAL1	
 
-#define ESPTELEINFO_VERSION "2.1.0a1"
 
 // I prefix debug macro to be sure to use specific for THIS library
 // debugging, this should not interfere with main sketch or other 
@@ -95,24 +113,6 @@ void floggerflush();
 #define Infoflush()  {}
 #endif
 
-// Pins #########################################
-#define RED_LED_PIN		12	//D8
-#define RGB_LED_PIN_R	2		//D4
-#define RGB_LED_PIN_G	0		//D3
-#define RGB_LED_PIN_B	14	//D5
-
-// Settings #####################################
-//#define OLED_PIN_SDA  4
-//#define OLED_PIN_SCL  5
-#define OLED_I2C_ID 0x3C
-#define OLED_WIDTH  128
-#define OLED_HEIGHT  64
-#define OLED_UNIT_X  80
-
-#define BLINK_LED_NEW_MS	40		// ms blink (when NEW frame received)
-#define BLINK_LED_UPD_MS	200	// ms blink (when UPDated frame received)
-
-
 // sysinfo informations
 // ===================================================
 typedef struct 
@@ -140,6 +140,7 @@ void Task_emoncms();
 void Task_jeedom();
 void Task_domoticz();
 void Task_domoticz();
+void floggerflush();
 void LedRgbColor(int rgb[3]);
 void LedRgbColorCurrent();
 #endif
