@@ -22,7 +22,7 @@ Cette réalisation est basée sur l'excellent  projet [Wifinfo][2] de [Charles H
 
 - Serveur Web fournissant le suivi en temps réel
 - Envoi de la TeleInfo vers Domoticz, Jeedom ou Emoncms
-- Affichage sur Afficheur OLED de la conso instantanée, et de la période tarifaire
+- Affichage sur écran OLED de la conso instantanée, et de la période tarifaire
 - Led RGB affichant la période tarifaire en court (Heures Pleine/ Heures Creuses)
 - Led affichant les trames recues
 
