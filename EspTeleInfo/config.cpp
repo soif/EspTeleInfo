@@ -30,15 +30,15 @@ _Config config;
 
 uint16_t crc16Update(uint16_t crc, uint8_t a)
 {
-  int i;
-  crc ^= a;
-  for (i = 0; i < 8; ++i)  {
-    if (crc & 1)
-      crc = (crc >> 1) ^ 0xA001;
-    else
-      crc = (crc >> 1);
-  }
-  return crc;
+	int i;
+	crc ^= a;
+	for (i = 0; i < 8; ++i)  {
+		if (crc & 1)
+			crc = (crc >> 1) ^ 0xA001;
+		else
+			crc = (crc >> 1);
+	}
+	return crc;
 }
 
 /* ======================================================================
@@ -51,34 +51,34 @@ Comments: -
 void eepromDump(uint8_t bytesPerRow) 
 {
  // uint16_t i,b; // // Unused Variable 'b'
-  uint16_t i;
-  //char buf[10];
-  uint16_t j=0 ;
-  
-  // default to 16 bytes per row
-  if (bytesPerRow==0)
-    bytesPerRow=16;
+	uint16_t i;
+	//char buf[10];
+	uint16_t j=0 ;
+	
+	// default to 16 bytes per row
+	if (bytesPerRow==0)
+		bytesPerRow=16;
 
-  Debugln();
-    
-  // loop thru EEP address
-  for (i = 0; i < sizeof(_Config); i++) {
-    // First byte of the row ?
-    if (j==0) {
+	Debugln();
+		
+	// loop thru EEP address
+	for (i = 0; i < sizeof(_Config); i++) {
+		// First byte of the row ?
+		if (j==0) {
 			// Display Address
-      Debugf("%04X : ", i);
-    }
+			Debugf("%04X : ", i);
+		}
 
-    // write byte in hex form
-    Debugf("%02X ", EEPROM.read(i));
+		// write byte in hex form
+		Debugf("%02X ", EEPROM.read(i));
 
 		// Last byte of the row ?
-    // start a new line
-    if (++j >= bytesPerRow) {
+		// start a new line
+		if (++j >= bytesPerRow) {
 			j=0;
-      Debugln();
+			Debugln();
 		}
-  }
+	}
 }
 
 /* ======================================================================
@@ -105,12 +105,12 @@ bool readConfig (bool clear_on_error)
 		// calc CRC
 		crc = crc16Update(crc, data);
 	}
-  
+	
 	// CRC Error ?
 	if (crc != 0) {
 		// Clear config if wanted
-    if (clear_on_error)
-		  memset(&config, 0, sizeof( _Config ));
+		if (clear_on_error)
+			memset(&config, 0, sizeof( _Config ));
 		return false;
 	}
 	
@@ -126,51 +126,51 @@ Comments: once saved, config is read again to check the CRC
 ====================================================================== */
 bool saveConfig (void) 
 {
-  uint8_t * pconfig ;
-  bool ret_code;
+	uint8_t * pconfig ;
+	bool ret_code;
 
-  //eepromDump(32);
+	//eepromDump(32);
 
-  // Init pointer 
-  pconfig = (uint8_t *) &config ;
+	// Init pointer 
+	pconfig = (uint8_t *) &config ;
 	
 	// Init CRC
-  config.crc = ~0;
+	config.crc = ~0;
 
 	// For whole size of config structure, pre-calculate CRC
-  for (uint16_t i = 0; i < sizeof (_Config) - 2; ++i)
-    config.crc = crc16Update(config.crc, *pconfig++);
+	for (uint16_t i = 0; i < sizeof (_Config) - 2; ++i)
+		config.crc = crc16Update(config.crc, *pconfig++);
 
 	// Re init pointer 
-  pconfig = (uint8_t *) &config ;
+	pconfig = (uint8_t *) &config ;
 
-  // For whole size of config structure, write to EEP
-  for (uint16_t i = 0; i < sizeof(_Config); ++i) 
-    EEPROM.write(i, *pconfig++);
+	// For whole size of config structure, write to EEP
+	for (uint16_t i = 0; i < sizeof(_Config); ++i) 
+		EEPROM.write(i, *pconfig++);
 
-  // Physically save
-  EEPROM.commit();
-  
-  // Read Again to see if saved ok, but do 
-  // not clear if error this avoid clearing
-  // default config and breaks OTA
-  ret_code = readConfig(false);
-  
-  Info(F("Write config "));
-  
-  if (ret_code)
-  {
-    Infoln(F("OK!"));
-  }
-  else
-  {
-    Infoln(F("Error!"));
-  }
+	// Physically save
+	EEPROM.commit();
+	
+	// Read Again to see if saved ok, but do 
+	// not clear if error this avoid clearing
+	// default config and breaks OTA
+	ret_code = readConfig(false);
+	
+	Info(F("Write config "));
+	
+	if (ret_code)
+	{
+		Infoln(F("OK!"));
+	}
+	else
+	{
+		Infoln(F("Error!"));
+	}
 
-  //eepromDump(32);
-  
-  // return result
-  return (ret_code);
+	//eepromDump(32);
+	
+	// return result
+	return (ret_code);
 }
 
 /* ======================================================================
@@ -182,46 +182,46 @@ Comments: -
 ====================================================================== */
 void showConfig() 
 {
-  DebuglnF("===== Wifi"); 
-  DebugF("ssid     :"); Debugln(config.ssid); 
-  DebugF("psk      :"); Debugln(config.psk); 
-  DebugF("host     :"); Debugln(config.host); 
-  DebugF("ap_psk   :"); Debugln(config.ap_psk);
-  DebugF("ap_retrycount:"); Debugln(config.ap_retrycount); 
-  DebugF("OTA auth :"); Debugln(config.ota_auth); 
-  DebugF("OTA port :"); Debugln(config.ota_port); 
-  DebugF("Config   :"); 
-  if (config.config & CFG_RGB_LED) DebugF(" RGB"); 
-  if (config.config & CFG_DEBUG)   DebugF(" DEBUG"); 
-  if (config.config & CFG_LCD)     DebugF(" LCD"); 
-  DebuglnF("\r\n===== Emoncms"); 
-  DebugF("host     :"); Debugln(config.emoncms.host); 
-  DebugF("port     :"); Debugln(config.emoncms.port); 
-  DebugF("url      :"); Debugln(config.emoncms.url); 
-  DebugF("key      :"); Debugln(config.emoncms.apikey); 
-  DebugF("node     :"); Debugln(config.emoncms.node); 
-  DebugF("freq     :"); Debugln(config.emoncms.freq); 
+	DebuglnF("===== Wifi"); 
+	DebugF("ssid     :"); Debugln(config.ssid); 
+	DebugF("psk      :"); Debugln(config.psk); 
+	DebugF("host     :"); Debugln(config.host); 
+	DebugF("ap_psk   :"); Debugln(config.ap_psk);
+	DebugF("ap_retrycount:"); Debugln(config.ap_retrycount); 
+	DebugF("OTA auth :"); Debugln(config.ota_auth); 
+	DebugF("OTA port :"); Debugln(config.ota_port); 
+	DebugF("Config   :"); 
+	if (config.config & CFG_RGB_LED) DebugF(" RGB"); 
+	if (config.config & CFG_DEBUG)   DebugF(" DEBUG"); 
+	if (config.config & CFG_LCD)     DebugF(" LCD"); 
+	DebuglnF("\r\n===== Emoncms"); 
+	DebugF("host     :"); Debugln(config.emoncms.host); 
+	DebugF("port     :"); Debugln(config.emoncms.port); 
+	DebugF("url      :"); Debugln(config.emoncms.url); 
+	DebugF("key      :"); Debugln(config.emoncms.apikey); 
+	DebugF("node     :"); Debugln(config.emoncms.node); 
+	DebugF("freq     :"); Debugln(config.emoncms.freq); 
 
-  DebuglnF("\r\n===== Jeedom"); 
-  DebugF("host     :"); Debugln(config.jeedom.host); 
-  DebugF("port     :"); Debugln(config.jeedom.port); 
-  DebugF("url      :"); Debugln(config.jeedom.url); 
-  DebugF("key      :"); Debugln(config.jeedom.apikey); 
-  DebugF("compteur :"); Debugln(config.jeedom.adco); 
-  DebugF("freq     :"); Debugln(config.jeedom.freq); 
+	DebuglnF("\r\n===== Jeedom"); 
+	DebugF("host     :"); Debugln(config.jeedom.host); 
+	DebugF("port     :"); Debugln(config.jeedom.port); 
+	DebugF("url      :"); Debugln(config.jeedom.url); 
+	DebugF("key      :"); Debugln(config.jeedom.apikey); 
+	DebugF("compteur :"); Debugln(config.jeedom.adco); 
+	DebugF("freq     :"); Debugln(config.jeedom.freq); 
 
-  DebuglnF("\r\n===== Domoticz"); 
-  DebugF("host     :"); Debugln(config.domoticz.host); 
-  DebugF("port     :"); Debugln(config.domoticz.port); 
-  DebugF("url      :"); Debugln(config.domoticz.url); 
-  DebugF("user     :"); Debugln(config.domoticz.usr); 
-  DebugF("password :"); Debugln(config.domoticz.pwd);
-  DebugF("idx_txt :"); Debugln(config.domoticz.idx_txt); 
-  DebugF("idx_p1sm :"); Debugln(config.domoticz.idx_p1sm); 
-  DebugF("idx_crt  :"); Debugln(config.domoticz.idx_crt); 
-  DebugF("idx_elec :"); Debugln(config.domoticz.idx_elec); 
-  DebugF("idx_kwh :"); Debugln(config.domoticz.idx_kwh); 
-  DebugF("idx_pct  :"); Debugln(config.domoticz.idx_pct); 
-  DebugF("freq     :"); Debugln(config.domoticz.freq); 
+	DebuglnF("\r\n===== Domoticz"); 
+	DebugF("host     :"); Debugln(config.domoticz.host); 
+	DebugF("port     :"); Debugln(config.domoticz.port); 
+	DebugF("url      :"); Debugln(config.domoticz.url); 
+	DebugF("user     :"); Debugln(config.domoticz.usr); 
+	DebugF("password :"); Debugln(config.domoticz.pwd);
+	DebugF("idx_txt :"); Debugln(config.domoticz.idx_txt); 
+	DebugF("idx_p1sm :"); Debugln(config.domoticz.idx_p1sm); 
+	DebugF("idx_crt  :"); Debugln(config.domoticz.idx_crt); 
+	DebugF("idx_elec :"); Debugln(config.domoticz.idx_elec); 
+	DebugF("idx_kwh :"); Debugln(config.domoticz.idx_kwh); 
+	DebugF("idx_pct  :"); Debugln(config.domoticz.idx_pct); 
+	DebugF("freq     :"); Debugln(config.domoticz.freq); 
 }
 

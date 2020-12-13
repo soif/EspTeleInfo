@@ -143,7 +143,7 @@ void floggerflush();
 // sysinfo informations
 typedef struct 
 {
-  String sys_uptime;
+	String sys_uptime;
 } _sysinfo;
 
 // Exported variables/object instancied in main sketch
