@@ -50,14 +50,14 @@ extern "C" {
 #include "PString.h"
 
 // Version #################################################################
-#define ESPTELEINFO_VERSION "2.1.0b1"
+#define ESPTELEINFO_VERSION "2.1.0b2"
 
 
 // Pins ###########################################################
 #define RED_LED_PIN		12	//D8
-#define RGB_LED_PIN_R	2		//D4
+#define RGB_LED_PIN_R	14	//D5
 #define RGB_LED_PIN_G	0		//D3
-#define RGB_LED_PIN_B	14	//D5
+#define RGB_LED_PIN_B	2		//D4
 
 // Settings #######################################################
 //#define OLED_PIN_SDA  4
