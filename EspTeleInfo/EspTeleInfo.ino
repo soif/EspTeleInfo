@@ -317,7 +317,7 @@ void UpdatedFrame(ValueList * me) {
 					snprintf(pad,sizeof(pad), "%6u", ival);
 					oled.print(pad);
 				}
-				else if(!strcmp(me->name,"OPTARIF")){
+				else if(!strcmp(me->name,"PTEC")){
 					oled.setCursor(0, 48);
 					if(!strcmp(me->value,"TH..")){
 						oled.print(F("Toutes"));
