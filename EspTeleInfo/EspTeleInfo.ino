@@ -320,23 +320,23 @@ void UpdatedFrame(ValueList * me) {
 				else if(!strcmp(me->name,"PTEC")){
 					oled.setCursor(0, 48);
 					if(!strcmp(me->value,"TH..")){
-						oled.print(F("Toutes"));
+						oled.print(F("H:Toutes"));
 						LedRgbColor(RGBLed::BLUE);
 					}
 					else if(!strcmp(me->value,"HC..")){
-						oled.print(F("Creuses"));
+						oled.print(F("H:Creuses"));
 						LedRgbColor(RGBLed::GREEN);
 					}
 					else if(!strcmp(me->value,"HP..")){
-						oled.print(F("Pleines"));
+						oled.print(F("H:Pleines"));
 						LedRgbColor(RGBLed::RED);
 					}
 					else if(!strcmp(me->value,"HN..")){
-						oled.print(F("Normales"));
+						oled.print(F("H:Normales"));
 						LedRgbColor(RGBLed::GREEN);
 					}
 					else if(!strcmp(me->value,"PM..")){
-						oled.print(F("Pointes"));
+						oled.print(F("H:Pointes"));
 						LedRgbColor(RGBLed::RED);
 					}
 					else{
