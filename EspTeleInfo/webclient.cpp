@@ -369,14 +369,27 @@ boolean domoticzPost(void)
 					url += "&nvalue=0";
 					url += "&svalue=";
 
-					//https://github.com/mattdevue/LibTeleinfo/commit/3a937279a1170ca9608e37b97214a527bdd526c2
-//          url += String(atoi(meMap["BASE"].c_str())).c_str();
-//          url += ";0;0;0;";
+					// Tarif Base
+					if (!strcmp(meMap["OPTARIF"].c_str(), "BASE")) {
+						url += String(atoi(meMap["BASE"].c_str())).c_str();
+						url += ";0;0;0;";
+					}
+					// Tarif Option Heures Creuses
+					else if(!strcmp(meMap["OPTARIF"].c_str(), "HC..")){
+						url += String(atoi(meMap["HCHC"].c_str())).c_str();
+						url += ";";
+						url += String(atoi(meMap["HCHP"].c_str())).c_str();
+						url += ";0;0;";
+					}
+					//TODO Tarif Option EJP
+					else if(!strcmp(meMap["OPTARIF"].c_str(), "EJP.")){
 
-					url += String(atoi(meMap["HCHC"].c_str())).c_str();
-					url += ";";
-					url += String(atoi(meMap["HCHP"].c_str())).c_str();
-					url += ";0;0;";
+					}
+					//TODO Tarif Option Tempo
+					else if(!strcmp(meMap["OPTARIF"].c_str(), "BBRx")){
+
+					}
+
 					url += String(atoi(meMap["PAPP"].c_str())).c_str();
 					url += ";0";
 
