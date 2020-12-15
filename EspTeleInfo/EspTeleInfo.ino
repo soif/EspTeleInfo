@@ -852,7 +852,11 @@ void setup()
 
 				if (upload.filename == "Wifinfo.spiffs.bin") //TODO: to be secured by checking Magic Number... 0xE9 for Flash 0x00 4 times for SPIFFS (No Magic Number)
 				{
-					command = U_SPIFFS;
+
+					//  https://github.com/philbowles/esparto/issues/19#issuecomment-513574469
+					// U_SPIFFS causes compil error in new espressif8266@2.6.2 
+					//command = U_SPIFFS; // for espressif8266 v1.8
+					command = U_FS;	// for espressif8266 v2.6.2 and up
 					Infoln("Flashing SPIFFS");
 					Infoflush();
 				}
