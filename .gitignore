@@ -1,7 +1,9 @@
 # ########################################################
 # Project
 # ########################################################
-EspTeleInfo/data/index.htm
+EspTeleInfo/data/*.htm
+EspTeleInfo/data/css/*.css
+EspTeleInfo/data/js/*.js
 
 # ########################################################
 # PlatformIO
