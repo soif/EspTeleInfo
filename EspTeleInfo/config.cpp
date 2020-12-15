@@ -216,6 +216,7 @@ void showConfig()
 	DebugF("idx_elec :"); Debugln(config.domoticz.idx_elec); 
 	DebugF("idx_kwh :"); Debugln(config.domoticz.idx_kwh); 
 	DebugF("idx_pct  :"); Debugln(config.domoticz.idx_pct); 
+	DebugF("idx_ptec  :"); Debugln(config.domoticz.idx_ptec); 
 	DebugF("freq     :"); Debugln(config.domoticz.freq); 
 }
 

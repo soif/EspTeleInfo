@@ -334,6 +334,32 @@ boolean domoticzPost(void)
 					*/
 			}
 
+			if(config.domoticz.idx_ptec > 0)
+			{
+					url = baseurl;
+					url += "idx=";
+					url += config.domoticz.idx_ptec;
+					url += "&nvalue=0";
+					url += "&svalue=";
+					url += meMap["PTEC"].c_str();
+
+					if(!httpPost( config.domoticz.host, config.domoticz.port, (char *) url.c_str()))
+					{
+						ret = false;
+					}
+					
+					/*
+					Info(config.domoticz.host);
+					InfoF(":");
+					Info(config.domoticz.port);
+					Infoln((char *) url.c_str());
+					InfoF("ret=");
+					Infoln(ret);
+					Infoflush();
+					*/
+			}
+
+
 			// /json.htm?type=command&param=udevice&idx=IDX&nvalue=0&svalue=USAGE1;USAGE2;RETURN1;RETURN2;CONS;PROD
 			if(config.domoticz.idx_p1sm > 0)
 			{

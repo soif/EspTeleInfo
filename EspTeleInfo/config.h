@@ -108,6 +108,7 @@
 #define CFG_FORM_DMCZ_IDX_ELEC  FPSTR("dmcz_idx_elec")
 #define CFG_FORM_DMCZ_IDX_KWH   FPSTR("dmcz_idx_kwh")
 #define CFG_FORM_DMCZ_IDX_PCT   FPSTR("dmcz_idx_pct")
+#define CFG_FORM_DMCZ_IDX_PTEC  FPSTR("dmcz_idx_ptec")
 #define CFG_FORM_DMCZ_FREQ      FPSTR("dmcz_freq")
 
 #define CFG_FORM_IP  FPSTR("wifi_ip");
@@ -153,13 +154,14 @@ typedef struct
 	char  url[CFG_DMCZ_URL_SIZE+1];       // Post URL (64+1=65 Bytes)
 	uint16_t port;                        // Protocol port (HTTP/HTTPS) (2 Bytes)
 	uint32_t freq;                        // refresh rate (4 Bytes)
-	uint16_t idx_txt;                     // Index device domoticz Text (2 Byte)
+	uint16_t idx_txt;                     // Index device domoticz Text ADCO (2 Byte)
 	uint16_t idx_p1sm;                    // Index device domoticz P1 Smart Meter (2 Bytes)
 	uint16_t idx_crt;                     // Index device domoticz Current (2 Bytes)
 	uint16_t idx_elec;                    // Index device domoticz Eletric (2 Byte)
 	uint16_t idx_kwh;                     // Index device domoticz Kwh (2 Byte)
 	uint16_t idx_pct;                     // Index device domoticz Percentage (2 Byte)
-	uint8_t filler[74];                   // in case adding data in config avoiding loosing current conf by bad crc (74 Bytes)
+	uint16_t idx_ptec;                    // Index device domoticz Text PTEC (2 Byte)
+	uint8_t filler[72];                   // in case adding data in config avoiding loosing current conf by bad crc (72 Bytes)
 } _domoticz;
 
 // Config saved into eeprom

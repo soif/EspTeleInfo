@@ -50,7 +50,7 @@ extern "C" {
 #include "PString.h"
 
 // Version #################################################################
-#define ESPTELEINFO_VERSION "2.1.0b5"
+#define ESPTELEINFO_VERSION "2.1.0b6"
 
 
 // Pins ###########################################################

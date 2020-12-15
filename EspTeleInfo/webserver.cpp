@@ -269,7 +269,10 @@ void handleFormConfig(void)
 		
 		itemp = server.arg("dmcz_idx_pct").toInt();
 		config.domoticz.idx_pct = itemp; 
-		
+
+		itemp = server.arg("dmcz_idx_ptec").toInt();
+		config.domoticz.idx_ptec = itemp; 
+
 		itemp = server.arg("dmcz_port").toInt();
 		config.domoticz.port = (itemp>=0 && itemp<=65535) ? itemp : CFG_DMCZ_DEFAULT_PORT ; 
 		itemp = server.arg("dmcz_freq").toInt();
@@ -762,6 +765,7 @@ void getConfJSONData(String & r)
 	r+=CFG_FORM_DMCZ_IDX_ELEC; r+=FPSTR(FP_QCQ); r+=config.domoticz.idx_elec; r+= FPSTR(FP_QCNL); 
 	r+=CFG_FORM_DMCZ_IDX_KWH;  r+=FPSTR(FP_QCQ); r+=config.domoticz.idx_kwh;  r+= FPSTR(FP_QCNL); 
 	r+=CFG_FORM_DMCZ_IDX_PCT;  r+=FPSTR(FP_QCQ); r+=config.domoticz.idx_pct;  r+= FPSTR(FP_QCNL); 
+	r+=CFG_FORM_DMCZ_IDX_PTEC; r+=FPSTR(FP_QCQ); r+=config.domoticz.idx_ptec; r+= FPSTR(FP_QCNL); 
 	r+=CFG_FORM_DMCZ_FREQ;     r+=FPSTR(FP_QCQ); r+=config.domoticz.freq;     r+= FPSTR(FP_QCNL); 
 
 	r+=CFG_FORM_JDOM_HOST; r+=FPSTR(FP_QCQ); r+=config.jeedom.host;   r+= FPSTR(FP_QCNL); 
